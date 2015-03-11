@@ -24,5 +24,5 @@ mymc <- as(transmat, "markovchain")
 
 summary(simplemc)
 
-plot(simplemc)
+#plot(simplemc)
 

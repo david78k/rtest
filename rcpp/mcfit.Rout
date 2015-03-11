@@ -82,9 +82,9 @@ NONE
 The Markov chain is irreducible 
 The absorbing states are: NONE
 > 
-> plot(simplemc)
+> #plot(simplemc)
 > 
 > 
 > proc.time()
    user  system elapsed 
-  4.784   0.994   5.902 
+  4.540   0.954   5.551 
