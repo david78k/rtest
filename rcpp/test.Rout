@@ -17,5 +17,24 @@ Type 'demo()' for some demos, 'help()' for on-line help, or
 'help.start()' for an HTML browser interface to help.
 Type 'q()' to quit R.
 
-> ELFError: unexpected input in ""
-Execution halted
+> library(Rcpp)
+> 
+> sourceCpp("test.cpp")
+
+> library(microbenchmark)
+
+> x <- runif(1e+05)
+
+> microbenchmark(mean(x), meanC(x))
+Loading required namespace: multcomp
+Unit: nanoseconds
+     expr    min       lq     mean median       uq     max neval
+  mean(x) 197511 339708.5 407990.8 360521 401448.0 2188546   100
+ meanC(x)      0 173207.0 222805.2 188153 232292.5  908775   100
+Warning message:
+In microbenchmark(mean(x), meanC(x)) :
+  Could not measure a positive execution time for one evaluation.
+> 
+> proc.time()
+   user  system elapsed 
+  7.086   3.639  11.050 
