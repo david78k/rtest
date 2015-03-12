@@ -1,7 +1,8 @@
 #!/bin/bash
 
-#file=mcfit
-file=gibbs
+#file=simplemc
+file=mcfit
+#file=gibbs
 R CMD BATCH $file.R
 cat $file.Rout
 

@@ -14,8 +14,84 @@
 #   return(out)
 # }
 
-library(markovchain)
-require(matlab)
+
+markovchainSequence<-function (n, markovchain, t0 = sample(markovchain@states, 1),
+                               include.t0 = FALSE)
+{
+  if (!(t0 %in% markovchain@states))
+    stop("Error! Initial state not defined")
+  chain <- rep(NA,n)# CHANGED
+  state <- t0
+  for (i in 1:n) {
+    rowProbs <- markovchain@transitionMatrix[which(markovchain@states == state), ]
+    outstate <- sample(size = 1, x = markovchain@states,
+                       prob = rowProbs)
+    chain[i] <- outstate #CHANGED
+    state <- outstate
+  }
+  if (include.t0)
+    out <- c(t0, chain)
+  else out <- chain
+  return(out)
+}
+
+
+
+################
+#random sampler#
+################
+
+#check if the subsequent states are included in the previous ones
+
+.checkSequence<-function(object)
+{
+  out<-TRUE
+  if(dim(object)==1) return(out) #if the size of the list is one do
+  for(i in 2:dim(object))
+  {
+    statesNm1<-states(object[[i-1]]) #evalutate mc n.1
+    statesN<-states(object[[i]]) #evaluate mc n
+    intersection<-intersect(statesNm1,statesN) #check the ibntersection
+    if(setequal(intersection, statesNm1)==FALSE) { #the states at n-1 
+      out<-FALSE
+      break
+    }
+  }
+  return(out)
+}
+
+
+#function to perform random sampling
+rmarkovchain<-function(n,object,...)
+{
+  if (class(object)=="markovchain") out<-markovchainSequence(n=n, markovchain=object,...)
+  if (class(object)=="markovchainList")
+  {
+    verify <-.checkSequence(object=object)
+    if(!verify) warning("Warning: some states in the markovchain sequences are not contained in the following states!")
+    iteration<-numeric()
+    values<-character()
+    for(i in 1:n) #number of replicates
+    {
+      #the first iteration may include initial state
+      sampledValues<-markovchainSequence(n=1,markovchain=object[[1]],...)
+      outIter<-rep(i,length(sampledValues))
+      if(dim(object)>1)
+        {for(j in 2:dim(object))
+        {
+          pos2take<-length(sampledValues)
+          newVals<-markovchainSequence(n=1,markovchain=object[[j]],t0=sampledValues[pos2take]) #the initial state is in the ending position of the mclist
+          outIter<-c(outIter,i)
+          sampledValues<-c(sampledValues,newVals)
+        }
+      }
+      iteration<-c(iteration, outIter)
+      values<-c(values, sampledValues)
+    }
+    out<-data.frame(iteration=iteration, values=values)
+  }
+  return(out)
+}
 
 #core function to get sequence matrix
 
@@ -35,13 +111,13 @@ createSequenceMatrix<-function(stringchar, toRowProbs=FALSE,sanitize=TRUE)
   #sanitizing if any row in the matrix sums to zero by posing the corresponding diagonal equal to 1/dim
   if(sanitize==TRUE)
   {
-          if(any(rowSums(freqMatrix)==0))
-          {
-                  indexesToBeSanitized<-which(rowSums(freqMatrix)==0)
-                  for(i in indexesToBeSanitized) {
-                          for(j in 1:sizeMatr) freqMatrix[i,j]<-1/sizeMatr
-                  }
-          }
+	  if(any(rowSums(freqMatrix)==0))
+	  {
+		  indexesToBeSanitized<-which(rowSums(freqMatrix)==0)
+		  for(i in indexesToBeSanitized) {
+			  for(j in 1:sizeMatr) freqMatrix[i,j]<-1/sizeMatr
+		  }
+	  }
   }
   if(toRowProbs==TRUE)
   {
@@ -198,8 +274,7 @@ createSequenceMatrix<-function(stringchar, toRowProbs=FALSE,sanitize=TRUE)
 
 #fit
 
-#markovchainFit<-function(data,method="mle", byrow=TRUE,nboot=10,laplacian=0, name, parallel=FALSE)
-mcfit<-function(data,method="mle", byrow=TRUE,nboot=10,laplacian=0, name, parallel=FALSE)
+markovchainFit<-function(data,method="mle", byrow=TRUE,nboot=10,laplacian=0, name, parallel=FALSE)
 {
   if(class(data) %in% c("data.frame","matrix")) {
     #if data is a data.frame forced to matrix
@@ -263,11 +338,4 @@ markovchainListFit<-function(data,byrow=TRUE, laplacian=0, name) {
   if(!missing(name)) out$estimate@name<-name
   return(out)
 }
-
-sequence <- c("a", "b", "a", "a", "a", "a", "b", "a", "b", "a", "b", "a", "a", "b", "b", "b", "a")
-mcfit(data = sequence)
-# $estimate
-#          a         b
-#a 0.4444444 0.5555556
-#b 0.7142857 0.2857143
 

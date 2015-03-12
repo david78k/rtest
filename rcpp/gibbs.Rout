@@ -43,15 +43,15 @@ Type 'q()' to quit R.
 > microbenchmark(gibbs_r(100, 10), gibbs_cpp(100, 10))
 Loading required namespace: multcomp
 Unit: microseconds
-               expr       min       lq       mean     median       uq
-   gibbs_r(100, 10) 24834.002 30135.37 40619.6391 35103.2880 38797.92
- gibbs_cpp(100, 10)   183.355   576.06   697.7647   617.1475   779.26
-        max neval
- 168239.249   100
-   2924.459   100
+               expr       min         lq       mean    median         uq
+   gibbs_r(100, 10) 23620.671 30087.9935 33424.1571 32644.344 36634.9740
+ gibbs_cpp(100, 10)   317.239   568.2335   704.6042   620.641   730.7655
+       max neval
+ 48908.589   100
+  3525.953   100
 Warning message:
 In fun(libname, pkgname) : no DISPLAY variable so Tk is not available
 > 
 > proc.time()
    user  system elapsed 
- 12.709   5.019  17.754 
+ 10.524   4.317  14.840 
