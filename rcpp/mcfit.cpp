@@ -1,8 +1,9 @@
 #include <Rcpp.h>
 using namespace Rcpp;
 
-NumericMatrix createSequenceMatrix_cpp(int N) {
-  NumericMatrix mat(N, 2);
+// createSequenceMatrix<-function(stringchar, toRowProbs=FALSE,sanitize=TRUE)
+NumericMatrix createSequenceMatrix_cpp(DataFrame stringchar, bool toRowProbs=false, bool sanitize=true) {
+  NumericMatrix mat(1, 2);
 /* 
   elements <- sort(unique(stringchar))
   sizeMatr <- length(elements)
@@ -36,15 +37,16 @@ NumericMatrix createSequenceMatrix_cpp(int N) {
 }
 
 // .mcFitMle<-function(stringchar,byrow)
-NumericMatrix _mcFitMle(DataFrame data, bool byrow) {
-  NumericMatrix mat(1, 1);
+NumericMatrix _mcFitMle(DataFrame stringchar, bool byrow) {
 /*
   initialMatr<-createSequenceMatrix(stringchar=stringchar,toRowProbs=TRUE)
   outMc<-new("markovchain", transitionMatrix=initialMatr,name="MLE Fit")
   if(byrow==FALSE) outMc<-t(outMc)
   out<-list(estimate=outMc)
 */
-  return mat;
+  NumericMatrix out = createSequenceMatrix_cpp(stringchar, true);
+  NumericMatrix initialMatr(1, 1);
+  return out;
 }
 
 // .mcFitLaplacianSmooth<-function(stringchar,byrow,laplacian=0.01)
