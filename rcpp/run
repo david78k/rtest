@@ -1,6 +1,7 @@
 #!/bin/bash
 
-file=mcfit
+#file=mcfit
+file=gibbs
 R CMD BATCH $file.R
 cat $file.Rout
 
