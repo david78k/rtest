@@ -42,8 +42,17 @@ NumericMatrix createSequenceMatrix_cpp(CharacterVector stringchar, bool toRowPro
   Rf_PrintValue(elements);
   int sizeMatr = elements.size();
   Rcout << sizeMatr << endl;
+  
+  NumericMatrix freqMatrix(sizeMatr);
+  rownames(freqMatrix) = elements;
+  colnames(freqMatrix) = elements;
+  freqMatrix.names();
 
-  NumericMatrix freqMatrix(1, 2);
+  //freqMatrix.rownames() = CharacterVector::create(elements[1]);
+  //freqMatrix.names() = CharacterVector::create(elements[0], elements[1]);
+  //List dimnames = freqMatrix.attr("dimnames");
+  //Rcout << dimnames[0] << endl;
+
   return (freqMatrix);
 }
 

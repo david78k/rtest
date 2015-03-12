@@ -316,8 +316,9 @@ The following object is masked from ‘package:base’:
  [1] "a" "b" "a" "a" "a" "a" "b" "a" "b" "a" "b" "a" "a" "b" "b" "b" "a"
 [1] "a" "b"
 2
-     [,1] [,2]
-[1,]    0    0
+  a b
+a 0 0
+b 0 0
 > #mcfit(data = sequence)
 > # $estimate
 > #          a         b
@@ -327,4 +328,4 @@ The following object is masked from ‘package:base’:
 > 
 > proc.time()
    user  system elapsed 
- 11.309   0.627  12.090 
+ 12.309   2.753  15.209 
