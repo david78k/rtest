@@ -267,7 +267,8 @@ markovchainListFit<-function(data,byrow=TRUE, laplacian=0, name) {
 library(Rcpp)
 sourceCpp("mcfit.cpp")
 
-#sequence <- c("a", "b", "a", "a", "a", "a", "b", "a", "b", "a", "b", "a", "a", "b", "b", "b", "a")
+sequence <- c("a", "b", "a", "a", "a", "a", "b", "a", "b", "a", "b", "a", "a", "b", "b", "b", "a")
+markovchainFit_cpp(sequence)
 #mcfit(data = sequence)
 # $estimate
 #          a         b

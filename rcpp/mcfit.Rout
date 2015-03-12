@@ -41,7 +41,7 @@ Attaching package: ‘markovchain’
 
 The following objects are masked _by_ ‘.GlobalEnv’:
 
-    createSequenceMatrix, markovchainFit, markovchainListFit
+    createSequenceMatrix, markovchainListFit
 
 > require(matlab)
 Loading required package: matlab
@@ -311,7 +311,12 @@ The following object is masked from ‘package:base’:
 > library(Rcpp)
 > sourceCpp("mcfit.cpp")
 > 
-> #sequence <- c("a", "b", "a", "a", "a", "a", "b", "a", "b", "a", "b", "a", "a", "b", "b", "b", "a")
+> sequence <- c("a", "b", "a", "a", "a", "a", "b", "a", "b", "a", "b", "a", "a", "b", "b", "b", "a")
+> markovchainFit_cpp(sequence)
+ [1] "a" "b" "a" "a" "a" "a" "b" "a" "b" "a" "b" "a" "a" "b" "b" "b" "a"
+[1] "a" "b"
+     [,1] [,2]
+[1,]    0    0
 > #mcfit(data = sequence)
 > # $estimate
 > #          a         b
@@ -321,4 +326,4 @@ The following object is masked from ‘package:base’:
 > 
 > proc.time()
    user  system elapsed 
- 10.810   2.012  12.939 
+ 11.315   0.605  11.896 

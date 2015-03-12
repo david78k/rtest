@@ -1,9 +1,10 @@
 #include <Rcpp.h>
 using namespace Rcpp;
+using namespace std;
 
 // createSequenceMatrix<-function(stringchar, toRowProbs=FALSE,sanitize=TRUE)
-NumericMatrix createSequenceMatrix_cpp(DataFrame stringchar, bool toRowProbs=false, bool sanitize=true) {
-  NumericMatrix mat(1, 2);
+NumericMatrix createSequenceMatrix_cpp(CharacterVector stringchar, bool toRowProbs=false, bool sanitize=true) {
+//NumericMatrix createSequenceMatrix_cpp(DataFrame stringchar, bool toRowProbs=false, bool sanitize=true) {
 /* 
   elements <- sort(unique(stringchar))
   sizeMatr <- length(elements)
@@ -33,11 +34,20 @@ NumericMatrix createSequenceMatrix_cpp(DataFrame stringchar, bool toRowProbs=fal
   }
   return(freqMatrix)
 */
-  return (mat);
+//  Rcout << stringchar[0] << endl;
+  Rf_PrintValue(stringchar);
+//  [1] "a" "b" "a" "a" "a" "a" "b" "a" "b" "a" "b" "a" "a" "b" "b" "b" "a"
+  
+  CharacterVector elements = unique(stringchar).sort();
+  Rf_PrintValue(elements);
+
+  NumericMatrix freqMatrix(1, 2);
+  return (freqMatrix);
 }
 
 // .mcFitMle<-function(stringchar,byrow)
-NumericMatrix _mcFitMle(DataFrame stringchar, bool byrow) {
+NumericMatrix _mcFitMle(CharacterVector stringchar, bool byrow) {
+//NumericMatrix _mcFitMle(DataFrame stringchar, bool byrow) {
 /*
   initialMatr<-createSequenceMatrix(stringchar=stringchar,toRowProbs=TRUE)
   outMc<-new("markovchain", transitionMatrix=initialMatr,name="MLE Fit")
@@ -181,7 +191,8 @@ void _matr2Mc() {
 
 // markovchainFit<-function(data,method="mle", byrow=TRUE,nboot=10,laplacian=0, name, parallel=FALSE)
 // [[Rcpp::export]]
-NumericMatrix markovchainFit_cpp(DataFrame data, String method="mle", bool byrow=true, int nboot=10, double laplacian=0, String name="", bool parallel=false) {
+NumericMatrix markovchainFit_cpp(CharacterVector data, String method="mle", bool byrow=true, int nboot=10, double laplacian=0, String name="", bool parallel=false) {
+//NumericMatrix markovchainFit_cpp(DataFrame data, String method="mle", bool byrow=true, int nboot=10, double laplacian=0, String name="", bool parallel=false) {
   NumericMatrix out(nboot, 2);
   if(method == "mle") out = _mcFitMle(data, byrow);
   if(method == "bootstrap") out = _mcFitBootStrap(data, nboot, byrow, parallel);
