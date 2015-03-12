@@ -315,6 +315,7 @@ The following object is masked from ‘package:base’:
 > markovchainFit_cpp(sequence)
  [1] "a" "b" "a" "a" "a" "a" "b" "a" "b" "a" "b" "a" "a" "b" "b" "b" "a"
 [1] "a" "b"
+2
      [,1] [,2]
 [1,]    0    0
 > #mcfit(data = sequence)
@@ -326,4 +327,4 @@ The following object is masked from ‘package:base’:
 > 
 > proc.time()
    user  system elapsed 
- 11.315   0.605  11.896 
+ 11.309   0.627  12.090 

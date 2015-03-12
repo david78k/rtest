@@ -40,6 +40,8 @@ NumericMatrix createSequenceMatrix_cpp(CharacterVector stringchar, bool toRowPro
   
   CharacterVector elements = unique(stringchar).sort();
   Rf_PrintValue(elements);
+  int sizeMatr = elements.size();
+  Rcout << sizeMatr << endl;
 
   NumericMatrix freqMatrix(1, 2);
   return (freqMatrix);
