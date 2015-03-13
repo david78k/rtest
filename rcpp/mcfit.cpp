@@ -73,7 +73,7 @@ NumericMatrix createSequenceMatrix_cpp(CharacterVector stringchar, bool toRowPro
     //Rf_PrintValue(freqMatrix);
   }
  
-  Rf_PrintValue(freqMatrix);
+  //Rf_PrintValue(freqMatrix);
 
   //sanitizing if any row in the matrix sums to zero by posing the corresponding diagonal equal to 1/dim
   if(sanitize==true)
@@ -102,6 +102,31 @@ NumericMatrix createSequenceMatrix_cpp(CharacterVector stringchar, bool toRowPro
   return (freqMatrix);
 }
 
+//template <typename T>
+//T transpose(const T & m) {      // tranpose for IntegerMatrix / NumericMatrix, see array.c in R
+NumericMatrix transpose(NumericMatrix & m) {      // tranpose for IntegerMatrix / NumericMatrix, see array.c in R
+  int k = m.rows(), n = m.cols();
+  //Rcpp::Rcout << "Transposing " << n << " by " << k << std::endl;
+  //T z(n, k);
+  NumericMatrix z(n, k);
+  CharacterVector rows = rownames(m);
+  CharacterVector cols = colnames(m);
+  List dimnms = List::create(rows, cols);
+  z.attr("dimnames") = dimnms;
+  //rownames(z) = rownames(m);
+  //Rf_PrintValue(rows);
+  //Rf_PrintValue(rownames(m));
+  //Rf_PrintValue(rownames(z));
+  int sz1 = n*k-1;
+  //typename T::iterator mit, zit;
+  NumericMatrix::iterator mit, zit;
+  for (mit = m.begin(), zit = z.begin(); mit != m.end(); mit++, zit += n) {
+  	if (zit >= z.end()) zit -= sz1;
+        *zit = *mit;
+  }
+  return(z);
+}
+
 // .mcFitMle<-function(stringchar,byrow)
 NumericMatrix _mcFitMle(CharacterVector stringchar, bool byrow) {
 //NumericMatrix _mcFitMle(DataFrame stringchar, bool byrow) {
@@ -112,7 +137,20 @@ NumericMatrix _mcFitMle(CharacterVector stringchar, bool byrow) {
   out<-list(estimate=outMc)
 */
   NumericMatrix out = createSequenceMatrix_cpp(stringchar, true);
-  NumericMatrix initialMatr(1, 1);
+  NumericMatrix initialMatr = createSequenceMatrix_cpp(stringchar, true);
+  Rf_PrintValue(out);
+  //rownames(out) = rownames(initialMatr);
+  //Rf_PrintValue(rownames(initialMatr));
+  //Rf_PrintValue(rownames(out));
+  out = transpose(out);
+  //rownames(out) = rownames(initialMatr);
+  //colnames(out) = colnames(initialMatr);
+  //Rf_PrintValue(rownames(initialMatr));
+  //Rf_PrintValue(rownames(out));
+  //Rf_PrintValue(out);
+  //NumericMatrix outMc(initialMatr); //("markovchain", initialMatr,"MLE Fit");
+//  if(byrow==false) outMc = transpose(outMc);
+  //out = list(outMc);
   return out;
 }
 
@@ -250,7 +288,7 @@ void _matr2Mc() {
 // [[Rcpp::export]]
 NumericMatrix markovchainFit_cpp(CharacterVector data, String method="mle", bool byrow=true, int nboot=10, double laplacian=0, String name="", bool parallel=false) {
 //NumericMatrix markovchainFit_cpp(DataFrame data, String method="mle", bool byrow=true, int nboot=10, double laplacian=0, String name="", bool parallel=false) {
-  NumericMatrix out(nboot, 2);
+  NumericMatrix out;
   if(method == "mle") out = _mcFitMle(data, byrow);
   if(method == "bootstrap") out = _mcFitBootStrap(data, nboot, byrow, parallel);
   if(method == "laplace") out = _mcFitLaplacianSmooth(data, byrow, laplacian);
@@ -275,10 +313,12 @@ NumericMatrix simplemc(int N, int thin) {
 }
 
 
-//*** R 
-/*
+/*** R 
 library(microbenchmark)
-sequence <- c("a", "b", "a", "a", "a", "a", "b", "a", "b", "a", "b", "a", "a", "b", "b", "b", "a")
+sequence <- c("a", "b", "a", "a", "a", "a", "b", "a", "b", "a", "b", "a", "a", "b", "b", "b", "a", "b")
+  markovchainFit_cpp(sequence)
+*/
+/*
 microbenchmark(
   markovchainFit(data = sequence),
   markovchainFit_cpp(100, 10)
