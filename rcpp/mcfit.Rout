@@ -310,31 +310,44 @@ The following object is masked from ‘package:base’:
 > 
 > library(Rcpp)
 > sourceCpp("mcfit.cpp")
-
-> library(microbenchmark)
-
-> sequence <- c("a", "b", "a", "a", "a", "a", "b", "a", 
-+     "b", "a", "b", "a", "a", "b", "b", "b", "a", "b")
-
-> markovchainFit_cpp(sequence)
-          a         b
-a 0.4000000 0.6000000
-b 0.7142857 0.2857143
-    a         b
-a 0.4 0.7142857
-b 0.6 0.2857143
-Warning message:
-In fun(libname, pkgname) : no DISPLAY variable so Tk is not available
-> 
-> #sequence <- c("a", "b", "a", "a", "a", "a", "b", "a", "b", "a", "b", "a", "a", "b", "b", "b", "a")
-> #markovchainFit_cpp(sequence)
-> #mcfit(data = sequence)
-> # $estimate
-> #          a         b
-> #a 0.4444444 0.5555556
-> #b 0.7142857 0.2857143
-> 
-> 
-> proc.time()
-   user  system elapsed 
- 10.848   2.065  13.066 
+mcfit.cpp: In function ‘Rcpp::NumericMatrix markovchainFit_cpp(Rcpp::CharacterVector, Rcpp::String, bool, int, double, Rcpp::String, bool)’:
+mcfit.cpp:305:34: error: ‘trans’ was not declared in this scope
+     if(!byrow) data = trans(data2);
+                                  ^
+mcfit.cpp:306:49: error: could not convert ‘data’ from ‘Rcpp::CharacterVector {aka Rcpp::Vector<16>}’ to ‘Rcpp::NumericMatrix {aka Rcpp::Matrix<14>}’
+     NumericMatrix outMc =_matr2Mc(data,laplacian);
+                                                 ^
+In file included from /usr/local/lib/R/site-library/Rcpp/include/Rcpp/Vector.h:48:0,
+                 from /usr/local/lib/R/site-library/Rcpp/include/Rcpp.h:38,
+                 from mcfit.cpp:1:
+/usr/local/lib/R/site-library/Rcpp/include/Rcpp/vector/converter.h: In instantiation of ‘static SEXPREC* Rcpp::internal::string_element_converter<RTYPE>::get(const T&) [with T = Rcpp::internal::DimNameProxy; int RTYPE = 16; SEXP = SEXPREC*]’:
+/usr/local/lib/R/site-library/Rcpp/include/Rcpp/generated/Vector__create.h:123:30:   required from ‘static Rcpp::Vector<RTYPE, StoragePolicy> Rcpp::Vector<RTYPE, StoragePolicy>::create__dispatch(Rcpp::traits::false_type, const T1&, const T2&) [with T1 = Rcpp::internal::DimNameProxy; T2 = Rcpp::internal::DimNameProxy; int RTYPE = 16; StoragePolicy = Rcpp::PreserveStorage; Rcpp::traits::false_type = Rcpp::traits::integral_constant<bool, false>]’
+/usr/local/lib/R/site-library/Rcpp/include/Rcpp/generated/Vector__create.h:112:21:   required from ‘static Rcpp::Vector<RTYPE, StoragePolicy> Rcpp::Vector<RTYPE, StoragePolicy>::create(const T1&, const T2&) [with T1 = Rcpp::internal::DimNameProxy; T2 = Rcpp::internal::DimNameProxy; int RTYPE = 16; StoragePolicy = Rcpp::PreserveStorage]’
+mcfit.cpp:118:85:   required from here
+/usr/local/lib/R/site-library/Rcpp/include/Rcpp/vector/converter.h:49:25: error: call of overloaded ‘basic_string(const Rcpp::internal::DimNameProxy&)’ is ambiguous
+    std::string out(input) ;
+                         ^
+/usr/local/lib/R/site-library/Rcpp/include/Rcpp/vector/converter.h:49:25: note: candidates are:
+In file included from /usr/include/c++/4.8/string:53:0,
+                 from /usr/include/c++/4.8/bits/locale_classes.h:40,
+                 from /usr/include/c++/4.8/bits/ios_base.h:41,
+                 from /usr/include/c++/4.8/ios:42,
+                 from /usr/include/c++/4.8/ostream:38,
+                 from /usr/include/c++/4.8/iterator:64,
+                 from /usr/local/lib/R/site-library/Rcpp/include/RcppCommon.h:54,
+                 from /usr/local/lib/R/site-library/Rcpp/include/Rcpp.h:27,
+                 from mcfit.cpp:1:
+/usr/include/c++/4.8/bits/basic_string.tcc:212:5: note: std::basic_string<_CharT, _Traits, _Alloc>::basic_string(const _CharT*, const _Alloc&) [with _CharT = char; _Traits = std::char_traits<char>; _Alloc = std::allocator<char>]
+     basic_string<_CharT, _Traits, _Alloc>::
+     ^
+/usr/include/c++/4.8/bits/basic_string.tcc:169:5: note: std::basic_string<_CharT, _Traits, _Alloc>::basic_string(const std::basic_string<_CharT, _Traits, _Alloc>&) [with _CharT = char; _Traits = std::char_traits<char>; _Alloc = std::allocator<char>]
+     basic_string<_CharT, _Traits, _Alloc>::
+     ^
+/usr/include/c++/4.8/bits/basic_string.tcc:177:5: note: std::basic_string<_CharT, _Traits, _Alloc>::basic_string(const _Alloc&) [with _CharT = char; _Traits = std::char_traits<char>; _Alloc = std::allocator<char>]
+     basic_string<_CharT, _Traits, _Alloc>::
+     ^
+make: *** [mcfit.o] Error 1
+g++ -I/usr/share/R/include -DNDEBUG    -I"/usr/local/lib/R/site-library/Rcpp/include" -I"/usr/local/lib/R/site-library/RcppArmadillo/include" -I"/mnt/github/rtest/rcpp"    -fpic  -O3 -pipe  -g  -c mcfit.cpp -o mcfit.o
+Error in sourceCpp("mcfit.cpp") : 
+  Error 1 occurred building shared library.
+Execution halted

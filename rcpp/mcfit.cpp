@@ -1,4 +1,7 @@
 #include <Rcpp.h>
+// [[Rcpp::depends(RcppArmadillo)]]
+//#include <RcppArmadillo.h>
+
 using namespace Rcpp;
 using namespace std;
 
@@ -109,10 +112,10 @@ NumericMatrix transpose(NumericMatrix & m) {      // tranpose for IntegerMatrix 
   //Rcpp::Rcout << "Transposing " << n << " by " << k << std::endl;
   //T z(n, k);
   NumericMatrix z(n, k);
-  CharacterVector rows = rownames(m);
-  CharacterVector cols = colnames(m);
-  List dimnms = List::create(rows, cols);
-  z.attr("dimnames") = dimnms;
+  //CharacterVector rows = rownames(m);
+  //CharacterVector cols = colnames(m);
+  //List dimnms = List::create(CharacterVector::create(rownames(m), colnames(m));
+  z.attr("dimnames") = List::create(CharacterVector::create(rownames(m), colnames(m))); 
   //rownames(z) = rownames(m);
   //Rf_PrintValue(rows);
   //Rf_PrintValue(rownames(m));
@@ -253,7 +256,7 @@ NumericMatrix _mcFitBootStrap(DataFrame data, int nboot=10, bool byrow=true, boo
 }
 
 // .matr2Mc<-function(matrData,laplacian=0) 
-void _matr2Mc() {
+NumericMatrix _matr2Mc(NumericMatrix matrData, double laplacian=0) {
 /*
   #find unique values scanning the matrix
   nCols<-ncol(matrData)
@@ -278,9 +281,10 @@ void _matr2Mc() {
   #get a transition matrix and a DTMC
   transitionMatrix<-contingencyMatrix/rowSums(contingencyMatrix)
   outMc<-new("markovchain",transitionMatrix=transitionMatrix)
- 
-  return(outMc)
 */
+  NumericMatrix outMc;
+ 
+  return(outMc);
 }
 
 
@@ -289,9 +293,23 @@ void _matr2Mc() {
 NumericMatrix markovchainFit_cpp(CharacterVector data, String method="mle", bool byrow=true, int nboot=10, double laplacian=0, String name="", bool parallel=false) {
 //NumericMatrix markovchainFit_cpp(DataFrame data, String method="mle", bool byrow=true, int nboot=10, double laplacian=0, String name="", bool parallel=false) {
   NumericMatrix out;
-  if(method == "mle") out = _mcFitMle(data, byrow);
-  if(method == "bootstrap") out = _mcFitBootStrap(data, nboot, byrow, parallel);
-  if(method == "laplace") out = _mcFitLaplacianSmooth(data, byrow, laplacian);
+  //if(class(data) %in% c("data.frame","matrix")) {
+  if(data.attr("class") == "data.frame" || data.attr("class") == "matrix") {
+    //#if data is a data.frame forced to matrix
+    //if(data.attr("class") == "data.frame") data =as.matrix(data);
+    CharacterMatrix data2;
+    if(data.attr("class") == "data.frame") data2 =wrap(data);
+    //if(data.attr("class") == "data.frame") data =as.matrix(data);
+    //byrow assumes distinct observations (trajectiories) are per row
+    //otherwise transpose
+    if(!byrow) data = trans(data2);
+    NumericMatrix outMc =_matr2Mc(data,laplacian);
+    //out<-list(estimate=outMc)
+  } else {
+    if(method == "mle") out = _mcFitMle(data, byrow);
+    if(method == "bootstrap") out = _mcFitBootStrap(data, nboot, byrow, parallel);
+    if(method == "laplace") out = _mcFitLaplacianSmooth(data, byrow, laplacian);
+  }
   return out;
 }
 
