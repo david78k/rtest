@@ -41,13 +41,26 @@ NumericMatrix createSequenceMatrix_cpp(CharacterVector stringchar, bool toRowPro
   CharacterVector elements = unique(stringchar).sort();
   Rf_PrintValue(elements);
   int sizeMatr = elements.size();
-  Rcout << sizeMatr << endl;
+  //Rcout << sizeMatr << endl;
   
   NumericMatrix freqMatrix(sizeMatr);
   rownames(freqMatrix) = elements;
   colnames(freqMatrix) = elements;
-  freqMatrix.names();
-
+  //Rf_PrintValue(rownames(freqMatrix));
+  //Rf_PrintValue(colnames(freqMatrix));
+  //Rf_PrintValue(freqMatrix.names());
+  CharacterVector rnames = rownames(freqMatrix);
+  Rf_PrintValue(freqMatrix);
+  for(int i = 0; i < stringchar.size() - 1; i ++) {
+    int posFrom = find(rnames.begin(), rnames.end(), stringchar[i]) - rnames.begin();
+    int posTo = find(rnames.begin(), rnames.end(), stringchar[i + 1]) - rnames.begin();
+    //Rcout << stringchar[i] << "->" << stringchar[i + 1] << ": " << posFrom << " " << posTo << endl;
+    freqMatrix(posFrom,posTo)++;
+    //freqMatrix[posFrom][posTo]=freqMatrix[posFrom][posTo]+1;
+    //Rf_PrintValue(freqMatrix);
+  }
+ 
+  Rf_PrintValue(freqMatrix);
   //freqMatrix.rownames() = CharacterVector::create(elements[1]);
   //freqMatrix.names() = CharacterVector::create(elements[0], elements[1]);
   //List dimnames = freqMatrix.attr("dimnames");

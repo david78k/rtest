@@ -315,10 +315,15 @@ The following object is masked from ‘package:base’:
 > markovchainFit_cpp(sequence)
  [1] "a" "b" "a" "a" "a" "a" "b" "a" "b" "a" "b" "a" "a" "b" "b" "b" "a"
 [1] "a" "b"
-2
   a b
 a 0 0
 b 0 0
+  a b
+a 4 5
+b 5 2
+  a b
+a 4 5
+b 5 2
 > #mcfit(data = sequence)
 > # $estimate
 > #          a         b
@@ -328,4 +333,4 @@ b 0 0
 > 
 > proc.time()
    user  system elapsed 
- 12.309   2.753  15.209 
+ 10.782   1.996  12.873 
