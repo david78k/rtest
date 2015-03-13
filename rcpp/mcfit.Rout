@@ -313,14 +313,9 @@ The following object is masked from ‘package:base’:
 > 
 > sequence <- c("a", "b", "a", "a", "a", "a", "b", "a", "b", "a", "b", "a", "a", "b", "b", "b", "a")
 > markovchainFit_cpp(sequence)
- [1] "a" "b" "a" "a" "a" "a" "b" "a" "b" "a" "b" "a" "a" "b" "b" "b" "a"
-[1] "a" "b"
   a b
 a 0 0
 b 0 0
-  a b
-a 4 5
-b 5 2
   a b
 a 4 5
 b 5 2
@@ -333,4 +328,4 @@ b 5 2
 > 
 > proc.time()
    user  system elapsed 
- 10.782   1.996  12.873 
+ 10.895   2.275  13.273 

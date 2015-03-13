@@ -2,6 +2,19 @@
 using namespace Rcpp;
 using namespace std;
 
+NumericVector rowSumsC(NumericMatrix x) {
+  int nrow = x.nrow(), ncol = x.ncol();
+  NumericVector out(nrow);
+
+  for (int i = 0; i < nrow; i++) {
+    double total = 0;
+    for (int j = 0; j < ncol; j++) 
+      total += x(i, j);
+    out[i] = total;
+  }
+  return out;
+}
+
 // createSequenceMatrix<-function(stringchar, toRowProbs=FALSE,sanitize=TRUE)
 NumericMatrix createSequenceMatrix_cpp(CharacterVector stringchar, bool toRowProbs=false, bool sanitize=true) {
 //NumericMatrix createSequenceMatrix_cpp(DataFrame stringchar, bool toRowProbs=false, bool sanitize=true) {
@@ -35,11 +48,11 @@ NumericMatrix createSequenceMatrix_cpp(CharacterVector stringchar, bool toRowPro
   return(freqMatrix)
 */
 //  Rcout << stringchar[0] << endl;
-  Rf_PrintValue(stringchar);
+  //Rf_PrintValue(stringchar);
 //  [1] "a" "b" "a" "a" "a" "a" "b" "a" "b" "a" "b" "a" "a" "b" "b" "b" "a"
   
   CharacterVector elements = unique(stringchar).sort();
-  Rf_PrintValue(elements);
+  //Rf_PrintValue(elements);
   int sizeMatr = elements.size();
   //Rcout << sizeMatr << endl;
   
@@ -50,7 +63,7 @@ NumericMatrix createSequenceMatrix_cpp(CharacterVector stringchar, bool toRowPro
   //Rf_PrintValue(colnames(freqMatrix));
   //Rf_PrintValue(freqMatrix.names());
   CharacterVector rnames = rownames(freqMatrix);
-  Rf_PrintValue(freqMatrix);
+//  Rf_PrintValue(freqMatrix);
   for(int i = 0; i < stringchar.size() - 1; i ++) {
     int posFrom = find(rnames.begin(), rnames.end(), stringchar[i]) - rnames.begin();
     int posTo = find(rnames.begin(), rnames.end(), stringchar[i + 1]) - rnames.begin();
@@ -60,11 +73,26 @@ NumericMatrix createSequenceMatrix_cpp(CharacterVector stringchar, bool toRowPro
     //Rf_PrintValue(freqMatrix);
   }
  
-  Rf_PrintValue(freqMatrix);
-  //freqMatrix.rownames() = CharacterVector::create(elements[1]);
-  //freqMatrix.names() = CharacterVector::create(elements[0], elements[1]);
-  //List dimnames = freqMatrix.attr("dimnames");
-  //Rcout << dimnames[0] << endl;
+  //Rf_PrintValue(freqMatrix);
+
+  //sanitizing if any row in the matrix sums to zero by posing the corresponding diagonal equal to 1/dim
+  if(sanitize==true)
+  {
+  //	NumericVector rsums = rowSumsC(freqMatrix);
+
+	for (int i = 0; i < sizeMatr; i++) {
+    		double total = 0;
+    		for (int j = 0; j < sizeMatr; j++) 
+      			total += freqMatrix(i, j);
+		if(total == 0)
+    			for (int j = 0; j < sizeMatr; j++) 
+      				freqMatrix(i, j) = 1/sizeMatr;
+	}
+  }
+  if(toRowProbs==true)
+  {
+    //freqMatrix<-freqMatrix/rowSums(freqMatrix)
+  }
 
   return (freqMatrix);
 }
