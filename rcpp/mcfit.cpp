@@ -1,6 +1,6 @@
 #include <Rcpp.h>
-// [[Rcpp::depends(RcppArmadillo)]]
 //#include <RcppArmadillo.h>
+//// [[Rcpp::depends(RcppArmadillo)]]
 
 using namespace Rcpp;
 using namespace std;
@@ -115,7 +115,8 @@ NumericMatrix transpose(NumericMatrix & m) {      // tranpose for IntegerMatrix 
   //CharacterVector rows = rownames(m);
   //CharacterVector cols = colnames(m);
   //List dimnms = List::create(CharacterVector::create(rownames(m), colnames(m));
-  z.attr("dimnames") = List::create(CharacterVector::create(rownames(m), colnames(m))); 
+  z.attr("dimnames") = List::create(rownames(m), colnames(m)); 
+  //z.attr("dimnames") = List::create(rows, cols); 
   //rownames(z) = rownames(m);
   //Rf_PrintValue(rows);
   //Rf_PrintValue(rownames(m));
@@ -295,15 +296,16 @@ NumericMatrix markovchainFit_cpp(CharacterVector data, String method="mle", bool
   NumericMatrix out;
   //if(class(data) %in% c("data.frame","matrix")) {
   if(data.attr("class") == "data.frame" || data.attr("class") == "matrix") {
+    Rcout << data.attr("class") << endl;
     //#if data is a data.frame forced to matrix
     //if(data.attr("class") == "data.frame") data =as.matrix(data);
-    CharacterMatrix data2;
-    if(data.attr("class") == "data.frame") data2 =wrap(data);
+  //  CharacterMatrix data2;
+    //if(data.attr("class") == "data.frame") data2 =wrap(data);
     //if(data.attr("class") == "data.frame") data =as.matrix(data);
     //byrow assumes distinct observations (trajectiories) are per row
     //otherwise transpose
-    if(!byrow) data = trans(data2);
-    NumericMatrix outMc =_matr2Mc(data,laplacian);
+  //  if(!byrow) data = trans(data2);
+   // NumericMatrix outMc =_matr2Mc(data,laplacian);
     //out<-list(estimate=outMc)
   } else {
     if(method == "mle") out = _mcFitMle(data, byrow);
