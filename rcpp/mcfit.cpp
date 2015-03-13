@@ -73,13 +73,11 @@ NumericMatrix createSequenceMatrix_cpp(CharacterVector stringchar, bool toRowPro
     //Rf_PrintValue(freqMatrix);
   }
  
-  //Rf_PrintValue(freqMatrix);
+  Rf_PrintValue(freqMatrix);
 
   //sanitizing if any row in the matrix sums to zero by posing the corresponding diagonal equal to 1/dim
   if(sanitize==true)
   {
-  //	NumericVector rsums = rowSumsC(freqMatrix);
-
 	for (int i = 0; i < sizeMatr; i++) {
     		double total = 0;
     		for (int j = 0; j < sizeMatr; j++) 
@@ -92,6 +90,13 @@ NumericMatrix createSequenceMatrix_cpp(CharacterVector stringchar, bool toRowPro
   if(toRowProbs==true)
   {
     //freqMatrix<-freqMatrix/rowSums(freqMatrix)
+	for (int i = 0; i < sizeMatr; i++) {
+    		double total = 0;
+    		for (int j = 0; j < sizeMatr; j++) 
+      			total += freqMatrix(i, j);
+    		for (int j = 0; j < sizeMatr; j++) 
+      			freqMatrix(i, j) /= total;
+	}
   }
 
   return (freqMatrix);
