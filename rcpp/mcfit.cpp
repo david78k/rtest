@@ -226,21 +226,26 @@ List _bootstrapCharacterSequences(CharacterVector stringchar, int n, int size=-1
   srand(time(NULL));
   for(int i = 0; i < n; i ++) {
 	CharacterVector charseq;	
-	int rnd = rand()%itemset.size();
-	//String ch = runif(itemset, 1);
-	//String ch = sample(itemset, 1);
+	int rnd = rand()%itemsetsize;
  	String ch = itemset[rnd];
 	//Rcout << rnd << " " << itemset[rnd] << endl;
 	//Rf_PrintValue(ch);
 	charseq.push_back(ch);
 	//Rf_PrintValue(charseq);
 	for(int j = 1; j < size; j ++) {
-		CharacterVector probsVector;
+		NumericVector probsVector;
 		for(int k = 0; k < itemsetsize; k ++) 
-		//for(int k = 0; k < rownames(contingencyMatrix).size(); k ++) 
-			//if(contingencyMatrix[k] == ch)
-				probsVector = contingencyMatrix[k];	
+			if((string)itemset[k] == (string) ch) {
+				probsVector = contingencyMatrix(k, _);	
+				//Rcout << k << " " << (string)ch << endl;
+				//Rf_PrintValue(probsVector);
+				break;
+			}
 		//String char = sample(itemset, 1, true, probsVector);
+  		//srand(time(NULL));
+		rnd = rand()%itemsetsize;
+ 		ch = itemset[rnd];
+		charseq.push_back(ch);
  	}
 	//samples[[samples.size() + 1]] = charseq;
 	samples.push_back(charseq);
@@ -277,6 +282,17 @@ void _fromBoot2Estimate() {
 */
 }
 
+List lapply(List input, Function f) {
+  int n = input.size();
+  List out(n);
+
+  for(int i = 0; i < n; i++) {
+    out[i] = f(input[i]);
+  }
+
+  return out;
+}
+
 // .mcFitBootStrap<-function(data, nboot=10,byrow=TRUE, parallel=FALSE)
 List _mcFitBootStrap(CharacterVector data, int nboot=10, bool byrow=true, bool parallel=false) {
 /*
@@ -304,10 +320,18 @@ List _mcFitBootStrap(CharacterVector data, int nboot=10, bool byrow=true, bool p
   return(out)
 */
   List theList = _bootstrapCharacterSequences(data, nboot);
+  int n = theList.size();
+  Rcout << "theList.size() " << n << endl;
   List pmsBootStrapped;
+  //List pmsBootStrapped(theList.size());
 
-  if(!parallel) pmsBootStrapped = theList;
-  else {
+  //if(!parallel) pmsBootStrapped = theList;
+  if(!parallel) { //pmsBootStrapped = lapply(theList, createSequenceMatrix_cpp, true, true);
+	for(int i = 0; i < n; i++) { 
+		pmsBootStrapped[i] = createSequenceMatrix_cpp(theList[i], true, true);
+		Rf_PrintValue(pmsBootStrapped[i]);
+	}
+  } else {
 		
   }
   //estimateList<-.fromBoot2Estimate(listMatr=pmsBootStrapped)

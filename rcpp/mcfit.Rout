@@ -323,70 +323,101 @@ BootStrap Estimate
  1 2 
  The transition matrix   (by rows)  is defined as follows 
           1         2
-1 0.4095058 0.5904942
-2 0.6913095 0.3086905
+1 0.3938600 0.6061400
+2 0.7444841 0.2555159
 
 
 $standardError
           [,1]      [,2]
-[1,] 0.1184772 0.1184772
-[2,] 0.1202545 0.1202545
+[1,] 0.1783937 0.1783937
+[2,] 0.1477857 0.1477857
 
 $bootStrapSamples
 $bootStrapSamples[[1]]
           a         b
-a 0.4000000 0.6000000
-b 0.8333333 0.1666667
+a 0.7272727 0.2727273
+b 0.8000000 0.2000000
 
 $bootStrapSamples[[2]]
           a         b
-a 0.3333333 0.6666667
-b 0.5000000 0.5000000
+a 0.5000000 0.5000000
+b 0.8333333 0.1666667
 
 $bootStrapSamples[[3]]
-      a     b
-a 0.250 0.750
-b 0.875 0.125
-
-$bootStrapSamples[[4]]
-          a         b
-a 0.5454545 0.4545455
-b 0.8000000 0.2000000
-
-$bootStrapSamples[[5]]
-          a         b
-a 0.2857143 0.7142857
-b 0.6666667 0.3333333
-
-$bootStrapSamples[[6]]
-          a         b
-a 0.5555556 0.4444444
-b 0.5714286 0.4285714
-
-$bootStrapSamples[[7]]
-      a     b
-a 0.375 0.625
-b 0.625 0.375
-
-$bootStrapSamples[[8]]
-          a         b
-a 0.6000000 0.4000000
-b 0.6666667 0.3333333
-
-$bootStrapSamples[[9]]
       a     b
 a 0.375 0.625
 b 0.750 0.250
 
-$bootStrapSamples[[10]]
+$bootStrapSamples[[4]]
+          a         b
+a 0.4444444 0.5555556
+b 0.7142857 0.2857143
+
+$bootStrapSamples[[5]]
       a     b
 a 0.375 0.625
 b 0.625 0.375
+
+$bootStrapSamples[[6]]
+          a         b
+a 0.5454545 0.4545455
+b 1.0000000 0.0000000
+
+$bootStrapSamples[[7]]
+          a         b
+a 0.1428571 0.8571429
+b 0.6666667 0.3333333
+
+$bootStrapSamples[[8]]
+          a         b
+a 0.4000000 0.6000000
+b 0.8333333 0.1666667
+
+$bootStrapSamples[[9]]
+          a         b
+a 0.2857143 0.7142857
+b 0.4444444 0.5555556
+
+$bootStrapSamples[[10]]
+          a         b
+a 0.1428571 0.8571429
+b 0.7777778 0.2222222
 
 
 
 > markovchainFit_cpp(sequence, "bootstrap")
 [1] "a" "b"
+theList.size() 10
+      a     b
+a 0.500 0.500
+b 0.625 0.375
+          a         b
+a 0.4285714 0.5714286
+b 0.5555556 0.4444444
+          a         b
+a 0.4285714 0.5714286
+b 0.5555556 0.4444444
+          a         b
+a 0.6666667 0.3333333
+b 0.7500000 0.2500000
+          a         b
+a 0.2857143 0.7142857
+b 0.5555556 0.4444444
+          a         b
+a 0.1666667 0.8333333
+b 0.4000000 0.6000000
+          a         b
+a 0.3333333 0.6666667
+b 0.1538462 0.8461538
+          a         b
+a 0.4285714 0.5714286
+b 0.4444444 0.5555556
+          a         b
+a 0.6000000 0.4000000
+b 0.6666667 0.3333333
+    a   b
+a 0.5 0.5
+b 0.5 0.5
 $estimate
 BootStrap Estimate 
  A  - dimensional discrete Markov Chain with following states 
@@ -396,36 +427,7 @@ numeric(0)
 
 
 $bootStrapSamples
-$bootStrapSamples[[1]]
-[1] "a"
-
-$bootStrapSamples[[2]]
-[1] "a"
-
-$bootStrapSamples[[3]]
-[1] "b"
-
-$bootStrapSamples[[4]]
-[1] "b"
-
-$bootStrapSamples[[5]]
-[1] "b"
-
-$bootStrapSamples[[6]]
-[1] "a"
-
-$bootStrapSamples[[7]]
-[1] "a"
-
-$bootStrapSamples[[8]]
-[1] "b"
-
-$bootStrapSamples[[9]]
-[1] "b"
-
-$bootStrapSamples[[10]]
-[1] "a"
-
+list()
 
 Warning message:
 In fun(libname, pkgname) : no DISPLAY variable so Tk is not available
@@ -441,4 +443,4 @@ In fun(libname, pkgname) : no DISPLAY variable so Tk is not available
 > 
 > proc.time()
    user  system elapsed 
-  9.088   2.109  11.192 
+  8.997   2.007  10.994 
