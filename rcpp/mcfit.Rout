@@ -313,39 +313,25 @@ The following object is masked from ‘package:base’:
 
 > library(microbenchmark)
 
-> sequence <- c("a", "b", "a", "a", "a", "a", "b", "a", 
-+     "b", "a", "b", "a", "a", "b", "b", "b", "a", "b")
+> sequence <- c("b", "a", "b", "a", "a", "a", "a", "b", 
++     "a", "b", "a", "b", "a", "a", "b", "b", "b", "a", "b")
 
 > sequence <- data.frame(t(sequence))
 
-> markovchainFit_cpp(sequence, byrow = FALSE)
-  X1 X2 X3 X4 X5 X6 X7 X8 X9 X10 X11 X12 X13 X14 X15 X16 X17 X18
-1  a  b  a  a  a  a  b  a  b   a   b   a   a   b   b   b   a   b
+> markovchainFit_cpp(sequence)
+  X1 X2 X3 X4 X5 X6 X7 X8 X9 X10 X11 X12 X13 X14 X15 X16 X17 X18 X19
+1  b  a  b  a  a  a  a  b  a   b   a   b   a   a   b   b   b   a   b
 data.frame to matrix
      [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9] [,10] [,11] [,12] [,13] [,14]
-[1,] "a"  "b"  "a"  "a"  "a"  "a"  "b"  "a"  "b"  "a"   "b"   "a"   "a"   "b"  
-     [,15] [,16] [,17] [,18]
-[1,] "b"   "b"   "a"   "b"  
-      [,1]
- [1,] "a" 
- [2,] "b" 
- [3,] "a" 
- [4,] "a" 
- [5,] "a" 
- [6,] "a" 
- [7,] "b" 
- [8,] "a" 
- [9,] "b" 
-[10,] "a" 
-[11,] "b" 
-[12,] "a" 
-[13,] "a" 
-[14,] "b" 
-[15,] "b" 
-[16,] "b" 
-[17,] "a" 
-[18,] "b" 
+[1,] "b"  "a"  "b"  "a"  "a"  "a"  "a"  "b"  "a"  "b"   "a"   "b"   "a"   "a"  
+     [,15] [,16] [,17] [,18] [,19]
+[1,] "b"   "b"   "b"   "a"   "b"  
+     [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9] [,10] [,11] [,12] [,13] [,14]
+[1,] "b"  "a"  "b"  "a"  "a"  "a"  "a"  "b"  "a"  "b"   "a"   "b"   "a"   "a"  
+     [,15] [,16] [,17] [,18] [,19]
+[1,] "b"   "b"   "b"   "a"   "b"  
 1
+ a b
 [[1]]
 NULL
 
@@ -366,4 +352,4 @@ In fun(libname, pkgname) : no DISPLAY variable so Tk is not available
 > 
 > proc.time()
    user  system elapsed 
- 12.027   2.612  14.718 
+ 12.118   2.635  14.928 

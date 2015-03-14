@@ -248,7 +248,8 @@ List _mcFitBootStrap(DataFrame data, int nboot=10, bool byrow=true, bool paralle
 }
 
 // .matr2Mc<-function(matrData,laplacian=0) 
-NumericMatrix _matr2Mc(SEXP matrData, double laplacian=0) {
+NumericMatrix _matr2Mc(CharacterMatrix matrData, double laplacian=0) {
+//NumericMatrix _matr2Mc(SEXP matrData, double laplacian=0) {
 /*
   #find unique values scanning the matrix
   nCols<-ncol(matrData)
@@ -274,12 +275,21 @@ NumericMatrix _matr2Mc(SEXP matrData, double laplacian=0) {
   transitionMatrix<-contingencyMatrix/rowSums(contingencyMatrix)
   outMc<-new("markovchain",transitionMatrix=transitionMatrix)
 */
-  CharacterMatrix mat(matrData);
-  //int nCols = as<CharacterMatrix>(matrData).ncol();
-  int nCols = mat.ncol();
-  Rf_PrintValue(mat);
-  Rcout << nCols << endl;
-  std::set<char> uniqueVals;
+  //CharacterMatrix mat(matrData);
+  int nRows = matrData.nrow(), nCols = matrData.ncol();
+  Rf_PrintValue(matrData);
+  Rcout << nRows << endl;
+  set<string> uniqueVals;
+  for(int i = 0; i < nRows; i++) 
+  	for(int j = 0; j < nCols; j++) 
+		uniqueVals.insert((string)matrData(i, j));	
+  //Rcout << uniqueVals << endl;
+  //Rf_PrintValue(uniqueVals);
+  for(set<string>::iterator it=uniqueVals.begin(); it!=uniqueVals.end(); ++it)
+	Rcout << ' ' << *it;
+  Rcout << endl;
+
+  
   NumericMatrix outMc;
 
   return(outMc);
@@ -316,10 +326,8 @@ List markovchainFit_cpp(SEXP data, String method="mle", bool byrow=true, int nbo
   	if(!byrow) mat = transpose(mat);
    	NumericMatrix outMc =_matr2Mc(mat,laplacian);
     	//out<-list(estimate=outMc)
-    	//out = list(outMc);
-	List list(1);
-	list["estimate"] = outMc;
-	out = list;
+	out = List(1);
+	out["estimate"] = outMc;
   } else {
     if(method == "mle") out = _mcFitMle(data, byrow);
     if(method == "bootstrap") out = _mcFitBootStrap(data, nboot, byrow, parallel);
@@ -350,8 +358,8 @@ NumericMatrix simplemc(int N, int thin) {
 library(microbenchmark)
 sequence <- c("a", "b", "a", "a", "a", "a", "b", "a", "b", "a", "b", "a", "a", "b", "b", "b", "a", "b")
 sequence <- data.frame(t(sequence))
-  #markovchainFit_cpp(sequence)
-  markovchainFit_cpp(sequence, byrow=FALSE)
+  markovchainFit_cpp(sequence)
+  #markovchainFit_cpp(sequence, byrow=FALSE)
 */
 /*
 microbenchmark(
