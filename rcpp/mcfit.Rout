@@ -310,48 +310,12 @@ The following object is masked from ‘package:base’:
 > 
 > library(Rcpp)
 > sourceCpp("mcfit.cpp")
-
-> library(microbenchmark)
-
-> sequence <- c("a", "b", "a", "a", "a", "a", "b", "a", 
-+     "b", "a", "b", "a", "a", "b", "b", "b", "a")
-
-> markovchainFit(data = sequence, method = "laplace", 
-+     laplacian = 0.1)
-$estimate
-Laplacian Smooth Fit 
- A  2 - dimensional discrete Markov Chain with following states 
- a b 
- The transition matrix   (by rows)  is defined as follows 
-          a         b
-a 0.4456522 0.5543478
-b 0.7083333 0.2916667
-
-
-
-> markovchainFit_cpp(sequence, "laplace", laplacian = 0.1)
-$estimate
-Laplacian Smooth Fit 
- A  2 - dimensional discrete Markov Chain with following states 
- a b 
- The transition matrix   (by rows)  is defined as follows 
-          a         b
-a 0.4456522 0.5543478
-b 0.7083333 0.2916667
-
-
-Warning message:
-In fun(libname, pkgname) : no DISPLAY variable so Tk is not available
-> 
-> #sequence <- c("a", "b", "a", "a", "a", "a", "b", "a", "b", "a", "b", "a", "a", "b", "b", "b", "a")
-> #markovchainFit_cpp(sequence)
-> #mcfit(data = sequence)
-> # $estimate
-> #          a         b
-> #a 0.4444444 0.5555556
-> #b 0.7142857 0.2857143
-> 
-> 
-> proc.time()
-   user  system elapsed 
-  9.519   3.311  12.862 
+mcfit.cpp: In function ‘Rcpp::List _bootstrapCharacterSequences(Rcpp::CharacterVector, int, int)’:
+mcfit.cpp:226:31: error: ‘sample’ was not declared in this scope
+  String ch = sample(itemset, 1);
+                               ^
+make: *** [mcfit.o] Error 1
+g++ -I/usr/share/R/include -DNDEBUG    -I"/usr/local/lib/R/site-library/Rcpp/include" -I"/media/sf_GitHub/rtest/rcpp"    -fpic  -O3 -pipe  -g  -c mcfit.cpp -o mcfit.o
+Error in sourceCpp("mcfit.cpp") : 
+  Error 1 occurred building shared library.
+Execution halted

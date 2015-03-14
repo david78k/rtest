@@ -195,7 +195,8 @@ List _mcFitLaplacianSmooth(CharacterVector stringchar, bool byrow, double laplac
 }
 
 // .bootstrapCharacterSequences<-function(stringchar, n, size=length(stringchar))
-void _bootstrapCharacterSequences() {
+//List _bootstrapCharacterSequences(CharacterVector stringchar, int n, int size=stringchar.size()) {
+List _bootstrapCharacterSequences(CharacterVector stringchar, int n, int size=-1) {
 /*
   contingencyMatrix<-createSequenceMatrix(stringchar=stringchar)
   samples<-list()
@@ -215,6 +216,21 @@ void _bootstrapCharacterSequences() {
   }
   return(samples)
 */
+  if(size == -1) size = stringchar.size();
+  NumericMatrix contingencyMatrix = createSequenceMatrix_cpp(stringchar);
+  List samples();
+  CharacterVector itemset = rownames(contingencyMatrix);
+  Rf_PrintValue(itemset);
+  for(int i = 0; i < n; i ++) {
+	CharacterVector charseq;	
+	String ch = sample(itemset, 1);
+	for(int j = 1; j < size; j ++) {
+		//CharacterVector probeVector = contingencyMatrix
+		//String char = sample(itemset, 1, true, probsVector);
+ 	}
+  }
+
+  return List(1);
 }
 
 // .fromBoot2Estimate<-function(listMatr)
@@ -245,8 +261,7 @@ void _fromBoot2Estimate() {
 }
 
 // .mcFitBootStrap<-function(data, nboot=10,byrow=TRUE, parallel=FALSE)
-List _mcFitBootStrap(DataFrame data, int nboot=10, bool byrow=true, bool parallel=false) {
-  NumericMatrix mat(1, 1);
+List _mcFitBootStrap(CharacterVector data, int nboot=10, bool byrow=true, bool parallel=false) {
 /*
   #create the list of bootstrap sequence sample
 	theList<-.bootstrapCharacterSequences(stringchar=data, n=nboot)
@@ -271,6 +286,7 @@ List _mcFitBootStrap(DataFrame data, int nboot=10, bool byrow=true, bool paralle
   out<-list(estimate=estimate, standardError=estimateList$estSigma,bootStrapSamples=pmsBootStrapped)
   return(out)
 */
+  List theList = _bootstrapCharacterSequences(data, nboot);
   List out(1);
   return out;
 }
@@ -437,10 +453,12 @@ sequence <- c("a", "b", "a", "a", "a", "a", "b", "a", "b", "a", "b", "a", "a", "
 #sequence <- data.frame(t(sequence))
 #microbenchmark(
   #markovchainFit(data = sequence)#,
-  markovchainFit(data = sequence, method="laplace", laplacian=0.1)#,
+  #markovchainFit(data = sequence, method="laplace", laplacian=0.1)#,
+  markovchainFit(data = sequence, method="bootstrap")#,
   #markovchainFit(data = sequence, byrow=FALSE)#,
   #markovchainFit_cpp(sequence)
-  markovchainFit_cpp(sequence, "laplace", laplacian=0.1)
+  markovchainFit_cpp(sequence, "bootstrap")
+  #markovchainFit_cpp(sequence, "laplace", laplacian=0.1)
   #markovchainFit_cpp(sequence, byrow=FALSE)
 #)
 */
