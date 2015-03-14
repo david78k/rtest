@@ -322,29 +322,36 @@ The following object is masked from ‘package:base’:
   X1 X2 X3 X4 X5 X6 X7 X8 X9 X10 X11 X12 X13 X14 X15 X16 X17 X18
 1  a  b  a  a  a  a  b  a  b   a   b   a   a   b   b   b   a   b
 data.frame to matrix
-     X1  X2  X3  X4  X5  X6  X7  X8  X9  X10 X11 X12 X13 X14 X15 X16 X17 X18
-[1,] "a" "b" "a" "a" "a" "a" "b" "a" "b" "a" "b" "a" "a" "b" "b" "b" "a" "b"
-    [,1]
-X1  "a" 
-X2  "b" 
-X3  "a" 
-X4  "a" 
-X5  "a" 
-X6  "a" 
-X7  "b" 
-X8  "a" 
-X9  "b" 
-X10 "a" 
-X11 "b" 
-X12 "a" 
-X13 "a" 
-X14 "b" 
-X15 "b" 
-X16 "b" 
-X17 "a" 
-X18 "b" 
+     [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9] [,10] [,11] [,12] [,13] [,14]
+[1,] "a"  "b"  "a"  "a"  "a"  "a"  "b"  "a"  "b"  "a"   "b"   "a"   "a"   "b"  
+     [,15] [,16] [,17] [,18]
+[1,] "b"   "b"   "a"   "b"  
+      [,1]
+ [1,] "a" 
+ [2,] "b" 
+ [3,] "a" 
+ [4,] "a" 
+ [5,] "a" 
+ [6,] "a" 
+ [7,] "b" 
+ [8,] "a" 
+ [9,] "b" 
+[10,] "a" 
+[11,] "b" 
+[12,] "a" 
+[13,] "a" 
+[14,] "b" 
+[15,] "b" 
+[16,] "b" 
+[17,] "a" 
+[18,] "b" 
 1
+[[1]]
+NULL
+
+$estimate
 numeric(0)
+
 Warning message:
 In fun(libname, pkgname) : no DISPLAY variable so Tk is not available
 > 
@@ -359,4 +366,4 @@ In fun(libname, pkgname) : no DISPLAY variable so Tk is not available
 > 
 > proc.time()
    user  system elapsed 
- 11.829   2.690  14.614 
+ 12.027   2.612  14.718 

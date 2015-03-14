@@ -126,7 +126,7 @@ T transpose(T & m) {      // tranpose for IntegerMatrix / NumericMatrix, see arr
 }
 
 // .mcFitMle<-function(stringchar,byrow)
-NumericMatrix _mcFitMle(CharacterVector stringchar, bool byrow) {
+List _mcFitMle(CharacterVector stringchar, bool byrow) {
 //NumericMatrix _mcFitMle(DataFrame stringchar, bool byrow) {
 /*
   initialMatr<-createSequenceMatrix(stringchar=stringchar,toRowProbs=TRUE)
@@ -134,26 +134,21 @@ NumericMatrix _mcFitMle(CharacterVector stringchar, bool byrow) {
   if(byrow==FALSE) outMc<-t(outMc)
   out<-list(estimate=outMc)
 */
-  NumericMatrix out = createSequenceMatrix_cpp(stringchar, true);
+  //NumericMatrix out = createSequenceMatrix_cpp(stringchar, true);
   NumericMatrix initialMatr = createSequenceMatrix_cpp(stringchar, true);
-  Rf_PrintValue(out);
-  //rownames(out) = rownames(initialMatr);
-  //Rf_PrintValue(rownames(initialMatr));
-  //Rf_PrintValue(rownames(out));
-  out = transpose(out);
-  //rownames(out) = rownames(initialMatr);
-  //colnames(out) = colnames(initialMatr);
-  //Rf_PrintValue(rownames(initialMatr));
-  //Rf_PrintValue(rownames(out));
-  //Rf_PrintValue(out);
+  Rf_PrintValue(initialMatr);
   //NumericMatrix outMc(initialMatr); //("markovchain", initialMatr,"MLE Fit");
-//  if(byrow==false) outMc = transpose(outMc);
+  NumericMatrix outMc;
+  //if(byrow==false) outMc = transpose(outMc);
+  if(byrow==false) outMc = transpose(initialMatr);
   //out = list(outMc);
+  List out(1);
+  out[0] = outMc;
   return out;
 }
 
 // .mcFitLaplacianSmooth<-function(stringchar,byrow,laplacian=0.01)
-NumericMatrix _mcFitLaplacianSmooth(DataFrame data, bool byrow, double laplacian=0.01) {
+List _mcFitLaplacianSmooth(DataFrame data, bool byrow, double laplacian=0.01) {
   NumericMatrix mat(1, 1);
 /*
   origNum<-createSequenceMatrix(stringchar=stringchar,toRowProbs=FALSE)
@@ -167,7 +162,8 @@ NumericMatrix _mcFitLaplacianSmooth(DataFrame data, bool byrow, double laplacian
 	if(byrow==FALSE) outMc<-t(outMc)
 	out<-list(estimate=outMc)
 */
-  return mat;
+  List out(1);
+  return out;
 }
 
 // .bootstrapCharacterSequences<-function(stringchar, n, size=length(stringchar))
@@ -221,7 +217,7 @@ void _fromBoot2Estimate() {
 }
 
 // .mcFitBootStrap<-function(data, nboot=10,byrow=TRUE, parallel=FALSE)
-NumericMatrix _mcFitBootStrap(DataFrame data, int nboot=10, bool byrow=true, bool parallel=false) {
+List _mcFitBootStrap(DataFrame data, int nboot=10, bool byrow=true, bool parallel=false) {
   NumericMatrix mat(1, 1);
 /*
   #create the list of bootstrap sequence sample
@@ -247,7 +243,8 @@ NumericMatrix _mcFitBootStrap(DataFrame data, int nboot=10, bool byrow=true, boo
   out<-list(estimate=estimate, standardError=estimateList$estSigma,bootStrapSamples=pmsBootStrapped)
   return(out)
 */
-  return mat;
+  List out(1);
+  return out;
 }
 
 // .matr2Mc<-function(matrData,laplacian=0) 
@@ -291,9 +288,9 @@ NumericMatrix _matr2Mc(SEXP matrData, double laplacian=0) {
 
 // markovchainFit<-function(data,method="mle", byrow=TRUE,nboot=10,laplacian=0, name, parallel=FALSE)
 // [[Rcpp::export]]
-NumericMatrix markovchainFit_cpp(SEXP data, String method="mle", bool byrow=true, int nboot=10, double laplacian=0, String name="", bool parallel=false) {
+List markovchainFit_cpp(SEXP data, String method="mle", bool byrow=true, int nboot=10, double laplacian=0, String name="", bool parallel=false) {
 //NumericMatrix markovchainFit_cpp(DataFrame data, String method="mle", bool byrow=true, int nboot=10, double laplacian=0, String name="", bool parallel=false) {
-  NumericMatrix out;
+  List out;
   Rf_PrintValue(data);
   //if(class(data) %in% c("data.frame","matrix")) {
   if(Rf_inherits(data, "data.frame") || Rf_inherits(data, "matrix")) { 
@@ -304,10 +301,12 @@ NumericMatrix markovchainFit_cpp(SEXP data, String method="mle", bool byrow=true
   		Rcout << "data.frame to matrix" << endl;
 		DataFrame df(data);
 		//data2 = internal::convert_using_rfunction(df, "as.matrix");
-		Function asMatrix("as.matrix");
-		mat = asMatrix(df);
+		//Function asMatrix("as.matrix"); // 2x faster than convert_using_frunction
+		//mat = asMatrix(df);
+		mat = CharacterMatrix(df.nrows(), df.size());
+		for(int i = 0; i < df.size(); i++)
+			mat(_,i) = CharacterVector(df[i]);
 		Rf_PrintValue(mat);
-  //		CharacterMatrix data2(df);
  	} else {
   		Rcout << "matrix" << endl;
 		mat = data;
@@ -317,6 +316,10 @@ NumericMatrix markovchainFit_cpp(SEXP data, String method="mle", bool byrow=true
   	if(!byrow) mat = transpose(mat);
    	NumericMatrix outMc =_matr2Mc(mat,laplacian);
     	//out<-list(estimate=outMc)
+    	//out = list(outMc);
+	List list(1);
+	list["estimate"] = outMc;
+	out = list;
   } else {
     if(method == "mle") out = _mcFitMle(data, byrow);
     if(method == "bootstrap") out = _mcFitBootStrap(data, nboot, byrow, parallel);
