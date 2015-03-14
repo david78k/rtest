@@ -310,21 +310,103 @@ The following object is masked from ‘package:base’:
 > 
 > library(Rcpp)
 > sourceCpp("mcfit.cpp")
-mcfit.cpp: In function ‘Rcpp::List _bootstrapCharacterSequences(Rcpp::CharacterVector, int, int)’:
-mcfit.cpp:234:50: error: ‘class Rcpp::internal::DimNameProxy’ has no member named ‘size’
-   for(int k = 0; k < rownames(contingencyMatrix).size(); k ++) 
-                                                  ^
-mcfit.cpp:235:25: error: invalid use of ‘Rcpp::Matrix<14>::Row’
-    if(contingencyMatrix.Row(k) == ch)
-                         ^
-mcfit.cpp:235:35: error: ‘ch’ was not declared in this scope
-    if(contingencyMatrix.Row(k) == ch)
-                                   ^
-mcfit.cpp:236:37: error: invalid use of ‘Rcpp::Matrix<14>::Row’
-     probsVector = contingencyMatrix.Row(k); 
-                                     ^
-make: *** [mcfit.o] Error 1
-g++ -I/usr/share/R/include -DNDEBUG    -I"/usr/local/lib/R/site-library/Rcpp/include" -I"/media/sf_GitHub/rtest/rcpp"    -fpic  -O3 -pipe  -g  -c mcfit.cpp -o mcfit.o
-Error in sourceCpp("mcfit.cpp") : 
-  Error 1 occurred building shared library.
-Execution halted
+
+> library(microbenchmark)
+
+> sequence <- c("a", "b", "a", "a", "a", "a", "b", "a", 
++     "b", "a", "b", "a", "a", "b", "b", "b", "a")
+
+> markovchainFit(data = sequence, method = "bootstrap")
+$estimate
+BootStrap Estimate 
+ A  2 - dimensional discrete Markov Chain with following states 
+ 1 2 
+ The transition matrix   (by rows)  is defined as follows 
+          1         2
+1 0.4455808 0.5544192
+2 0.8035714 0.1964286
+
+
+$standardError
+          [,1]      [,2]
+[1,] 0.1725614 0.1725614
+[2,] 0.2000921 0.2000921
+
+$bootStrapSamples
+$bootStrapSamples[[1]]
+      a     b
+a 0.375 0.625
+b 0.750 0.250
+
+$bootStrapSamples[[2]]
+          a         b
+a 0.4545455 0.5454545
+b 1.0000000 0.0000000
+
+$bootStrapSamples[[3]]
+          a         b
+a 0.6363636 0.3636364
+b 1.0000000 0.0000000
+
+$bootStrapSamples[[4]]
+    a   b
+a 0.5 0.5
+b 0.5 0.5
+
+$bootStrapSamples[[5]]
+          a         b
+a 0.4444444 0.5555556
+b 0.8571429 0.1428571
+
+$bootStrapSamples[[6]]
+          a         b
+a 0.5555556 0.4444444
+b 0.7142857 0.2857143
+
+$bootStrapSamples[[7]]
+          a         b
+a 0.4444444 0.5555556
+b 0.7142857 0.2857143
+
+$bootStrapSamples[[8]]
+          a         b
+a 0.5454545 0.4545455
+b 1.0000000 0.0000000
+
+$bootStrapSamples[[9]]
+    a   b
+a 0.5 0.5
+b 1.0 0.0
+
+$bootStrapSamples[[10]]
+    a   b
+a 0.0 1.0
+b 0.5 0.5
+
+
+
+> markovchainFit_cpp(sequence, "bootstrap")
+[1] "a" "b"
+$estimate
+BootStrap Estimate 
+ A  - dimensional discrete Markov Chain with following states 
+ a b 
+ The transition matrix   (by rows)  is defined as follows 
+numeric(0)
+
+
+Warning message:
+In fun(libname, pkgname) : no DISPLAY variable so Tk is not available
+> 
+> #sequence <- c("a", "b", "a", "a", "a", "a", "b", "a", "b", "a", "b", "a", "a", "b", "b", "b", "a")
+> #markovchainFit_cpp(sequence)
+> #mcfit(data = sequence)
+> # $estimate
+> #          a         b
+> #a 0.4444444 0.5555556
+> #b 0.7142857 0.2857143
+> 
+> 
+> proc.time()
+   user  system elapsed 
+ 11.151   3.773  14.816 

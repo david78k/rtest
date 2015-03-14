@@ -218,8 +218,9 @@ List _bootstrapCharacterSequences(CharacterVector stringchar, int n, int size=-1
 */
   if(size == -1) size = stringchar.size();
   NumericMatrix contingencyMatrix = createSequenceMatrix_cpp(stringchar);
-  List samples();
+  List samples;
   CharacterVector itemset = rownames(contingencyMatrix);
+  int itemsetsize = itemset.size();
   Rf_PrintValue(itemset);
 
   srand(time(NULL));
@@ -228,17 +229,24 @@ List _bootstrapCharacterSequences(CharacterVector stringchar, int n, int size=-1
 	int rnd = rand()%itemset.size();
 	//String ch = runif(itemset, 1);
 	//String ch = sample(itemset, 1);
-	charseq.push_back(itemset[rnd]);
+ 	String ch = itemset[rnd];
+	//Rcout << rnd << " " << itemset[rnd] << endl;
+	//Rf_PrintValue(ch);
+	charseq.push_back(ch);
+	//Rf_PrintValue(charseq);
 	for(int j = 1; j < size; j ++) {
 		CharacterVector probsVector;
-		for(int k = 0; k < rownames(contingencyMatrix).size(); k ++) 
-			if(contingencyMatrix.Row(k) == ch)
-				probsVector = contingencyMatrix.Row(k);	
+		for(int k = 0; k < itemsetsize; k ++) 
+		//for(int k = 0; k < rownames(contingencyMatrix).size(); k ++) 
+			//if(contingencyMatrix[k] == ch)
+				probsVector = contingencyMatrix[k];	
 		//String char = sample(itemset, 1, true, probsVector);
  	}
+	//samples[[samples.size() + 1]] = charseq;
+	samples = List::create(samples, charseq);
   }
 
-  return List(1);
+  return samples;
 }
 
 // .fromBoot2Estimate<-function(listMatr)
@@ -295,8 +303,19 @@ List _mcFitBootStrap(CharacterVector data, int nboot=10, bool byrow=true, bool p
   return(out)
 */
   List theList = _bootstrapCharacterSequences(data, nboot);
-  List out(1);
-  return out;
+ 
+  //estimateList<-.fromBoot2Estimate(listMatr=pmsBootStrapped)
+  NumericMatrix transMatr;
+
+  S4 estimate("markovchain");
+  estimate.slot("transitionMatrix") = transMatr;
+  estimate.slot("byrow") = byrow;
+  estimate.slot("name") = "BootStrap Estimate";  
+
+  return List::create(_["estimate"] = estimate
+		//, _["standardError"] = estimateList.attr("estSigma")
+		//, _["bootStrapSamples"] = pmsBootStrapped
+		);
 }
 
 // .matr2Mc<-function(matrData,laplacian=0) 
