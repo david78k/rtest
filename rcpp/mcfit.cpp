@@ -257,7 +257,7 @@ NumericMatrix _mcFitBootStrap(DataFrame data, int nboot=10, bool byrow=true, boo
 }
 
 // .matr2Mc<-function(matrData,laplacian=0) 
-NumericMatrix _matr2Mc(NumericMatrix matrData, double laplacian=0) {
+NumericMatrix _matr2Mc(SEXP matrData, double laplacian=0) {
 /*
   #find unique values scanning the matrix
   nCols<-ncol(matrData)
@@ -283,20 +283,30 @@ NumericMatrix _matr2Mc(NumericMatrix matrData, double laplacian=0) {
   transitionMatrix<-contingencyMatrix/rowSums(contingencyMatrix)
   outMc<-new("markovchain",transitionMatrix=transitionMatrix)
 */
+  int nCols = as<CharacterMatrix>(matrData).ncol();
+  std::set<char> uniqueVals;
   NumericMatrix outMc;
- 
+
   return(outMc);
 }
 
 
 // markovchainFit<-function(data,method="mle", byrow=TRUE,nboot=10,laplacian=0, name, parallel=FALSE)
 // [[Rcpp::export]]
-NumericMatrix markovchainFit_cpp(CharacterVector data, String method="mle", bool byrow=true, int nboot=10, double laplacian=0, String name="", bool parallel=false) {
+NumericMatrix markovchainFit_cpp(SEXP data, String method="mle", bool byrow=true, int nboot=10, double laplacian=0, String name="", bool parallel=false) {
 //NumericMatrix markovchainFit_cpp(DataFrame data, String method="mle", bool byrow=true, int nboot=10, double laplacian=0, String name="", bool parallel=false) {
   NumericMatrix out;
+  Rf_PrintValue(data);
+  if(Rf_inherits(data, "data.frame") || Rf_inherits(data, "matrix")) { 
+  	if(Rf_inherits(data, "data.frame")) 
+  		Rcout << "data.frame" << endl;
+ 	else
+  		Rcout << "matrix" << endl;
+//  NumericMatrix outMc =_matr2Mc(data,laplacian);
   //if(class(data) %in% c("data.frame","matrix")) {
+/*
   if(data.attr("class") == "data.frame" || data.attr("class") == "matrix") {
-    Rcout << data.attr("class") << endl;
+    //Rcout << data.attr("class") << endl;
     //#if data is a data.frame forced to matrix
     //if(data.attr("class") == "data.frame") data =as.matrix(data);
   //  CharacterMatrix data2;
@@ -307,11 +317,12 @@ NumericMatrix markovchainFit_cpp(CharacterVector data, String method="mle", bool
   //  if(!byrow) data = trans(data2);
    // NumericMatrix outMc =_matr2Mc(data,laplacian);
     //out<-list(estimate=outMc)
+*/
   } else {
     if(method == "mle") out = _mcFitMle(data, byrow);
     if(method == "bootstrap") out = _mcFitBootStrap(data, nboot, byrow, parallel);
     if(method == "laplace") out = _mcFitLaplacianSmooth(data, byrow, laplacian);
-  }
+ }
   return out;
 }
 
@@ -336,6 +347,7 @@ NumericMatrix simplemc(int N, int thin) {
 /*** R 
 library(microbenchmark)
 sequence <- c("a", "b", "a", "a", "a", "a", "b", "a", "b", "a", "b", "a", "a", "b", "b", "b", "a", "b")
+sequence <- data.frame(sequence)
   markovchainFit_cpp(sequence)
 */
 /*
