@@ -316,16 +316,19 @@ The following object is masked from ‘package:base’:
 > sequence <- c("a", "b", "a", "a", "a", "a", "b", "a", 
 +     "b", "a", "b", "a", "a", "b", "b", "b", "a")
 
-> markovchainFit_cpp(sequence)
- [1] "a" "b" "a" "a" "a" "a" "b" "a" "b" "a" "b" "a" "a" "b" "b" "b" "a"
-          a         b
-a 0.4444444 0.5555556
-b 0.7142857 0.2857143
-[[1]]
-numeric(0)
-
-Warning message:
-In fun(libname, pkgname) : no DISPLAY variable so Tk is not available
+> microbenchmark(markovchainFit(data = sequence), markovchainFit_cpp(sequence))
+Loading required namespace: multcomp
+Unit: nanoseconds
+                            expr     min        lq       mean  median      uq
+ markovchainFit(data = sequence) 2560777 3571433.0 4419270.40 3940569 4404922
+    markovchainFit_cpp(sequence)       0   47328.5   86822.49   76508   92145
+      max neval
+ 20986583   100
+   951322   100
+Warning messages:
+1: In fun(libname, pkgname) : no DISPLAY variable so Tk is not available
+2: In microbenchmark(markovchainFit(data = sequence), markovchainFit_cpp(sequence)) :
+  Could not measure a positive execution time for one evaluation.
 > 
 > #sequence <- c("a", "b", "a", "a", "a", "a", "b", "a", "b", "a", "b", "a", "a", "b", "b", "b", "a")
 > #markovchainFit_cpp(sequence)
@@ -338,4 +341,4 @@ In fun(libname, pkgname) : no DISPLAY variable so Tk is not available
 > 
 > proc.time()
    user  system elapsed 
-  7.527   1.649   9.189 
+  9.386   4.114  13.451 
