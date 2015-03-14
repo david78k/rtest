@@ -86,10 +86,10 @@ NumericMatrix createSequenceMatrix_cpp(CharacterVector stringchar, bool toRowPro
   if(sanitize==true)
   {
 	for (int i = 0; i < sizeMatr; i++) {
-    		double total = 0;
+    		double rowSum = 0;
     		for (int j = 0; j < sizeMatr; j++) 
-      			total += freqMatrix(i, j);
-		if(total == 0)
+      			rowSum += freqMatrix(i, j);
+		if(rowSum == 0)
     			for (int j = 0; j < sizeMatr; j++) 
       				freqMatrix(i, j) = 1/sizeMatr;
 	}
@@ -98,11 +98,11 @@ NumericMatrix createSequenceMatrix_cpp(CharacterVector stringchar, bool toRowPro
   {
     //freqMatrix<-freqMatrix/rowSums(freqMatrix)
 	for (int i = 0; i < sizeMatr; i++) {
-    		double total = 0;
+    		double rowSum = 0;
     		for (int j = 0; j < sizeMatr; j++) 
-      			total += freqMatrix(i, j);
+      			rowSum += freqMatrix(i, j);
     		for (int j = 0; j < sizeMatr; j++) 
-      			freqMatrix(i, j) /= total;
+      			freqMatrix(i, j) /= rowSum;
 	}
   }
 
@@ -150,7 +150,7 @@ List _mcFitMle(CharacterVector stringchar, bool byrow) {
   outMc.slot("transitionMatrix") = initialMatr;
   outMc.slot("name") = "MLE Fit";  
 
-  return List::create(outMc);
+  return List::create(_["estimate"] = outMc);
   //List out(1);
   //out[0] = outMc;
   //return out;
@@ -348,6 +348,7 @@ S4 _matr2Mc(CharacterMatrix matrData, double laplacian=0) {
 // markovchainFit<-function(data,method="mle", byrow=TRUE,nboot=10,laplacian=0, name, parallel=FALSE)
 // [[Rcpp::export]]
 List markovchainFit_cpp(SEXP data, String method="mle", bool byrow=true, int nboot=10, double laplacian=0, String name="", bool parallel=false) {
+//List markovchainFit_cpp(SEXP data, String method="mle", bool byrow=true, int nboot=10, double laplacian=0, String name="", bool parallel=false) {
 //NumericMatrix markovchainFit_cpp(DataFrame data, String method="mle", bool byrow=true, int nboot=10, double laplacian=0, String name="", bool parallel=false) {
   List out;
  // Rf_PrintValue(data);
@@ -382,7 +383,12 @@ List markovchainFit_cpp(SEXP data, String method="mle", bool byrow=true, int nbo
     if(method == "mle") out = _mcFitMle(data, byrow);
     if(method == "bootstrap") out = _mcFitBootStrap(data, nboot, byrow, parallel);
     if(method == "laplace") out = _mcFitLaplacianSmooth(data, byrow, laplacian);
- }
+  }
+//  if(!missing(name)) out$estimate@name<-name
+  S4 estimate = out["estimate"];
+  estimate.slot("name") = name;
+  //((S4)(out["estimate"])).slot("name") = name;
+  //if(!name.empty()) ((S4)out["estimate"]).slot("name") = name;
   return out;
 }
 
@@ -408,10 +414,11 @@ NumericMatrix simplemc(int N, int thin) {
 library(microbenchmark)
 sequence <- c("a", "b", "a", "a", "a", "a", "b", "a", "b", "a", "b", "a", "a", "b", "b", "b", "a")
 #sequence <- data.frame(t(sequence))
-microbenchmark(
-  markovchainFit(data = sequence),
+#microbenchmark(
+#  markovchainFit(data = sequence),
   markovchainFit_cpp(sequence)
-)
+  #markovchainFit_cpp(sequence, byrow=FALSE)
+#)
 */
 /*  markovchainFit_cpp(sequence)
   #markovchainFit_cpp(sequence, byrow=FALSE)
