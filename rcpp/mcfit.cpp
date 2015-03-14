@@ -221,11 +221,19 @@ List _bootstrapCharacterSequences(CharacterVector stringchar, int n, int size=-1
   List samples();
   CharacterVector itemset = rownames(contingencyMatrix);
   Rf_PrintValue(itemset);
+
+  srand(time(NULL));
   for(int i = 0; i < n; i ++) {
 	CharacterVector charseq;	
-	String ch = sample(itemset, 1);
+	int rnd = rand()%itemset.size();
+	//String ch = runif(itemset, 1);
+	//String ch = sample(itemset, 1);
+	charseq.push_back(itemset[rnd]);
 	for(int j = 1; j < size; j ++) {
-		//CharacterVector probeVector = contingencyMatrix
+		CharacterVector probsVector;
+		for(int k = 0; k < rownames(contingencyMatrix).size(); k ++) 
+			if(contingencyMatrix.Row(k) == ch)
+				probsVector = contingencyMatrix.Row(k);	
 		//String char = sample(itemset, 1, true, probsVector);
  	}
   }

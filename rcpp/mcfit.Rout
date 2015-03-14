@@ -311,9 +311,18 @@ The following object is masked from ‘package:base’:
 > library(Rcpp)
 > sourceCpp("mcfit.cpp")
 mcfit.cpp: In function ‘Rcpp::List _bootstrapCharacterSequences(Rcpp::CharacterVector, int, int)’:
-mcfit.cpp:226:31: error: ‘sample’ was not declared in this scope
-  String ch = sample(itemset, 1);
-                               ^
+mcfit.cpp:234:50: error: ‘class Rcpp::internal::DimNameProxy’ has no member named ‘size’
+   for(int k = 0; k < rownames(contingencyMatrix).size(); k ++) 
+                                                  ^
+mcfit.cpp:235:25: error: invalid use of ‘Rcpp::Matrix<14>::Row’
+    if(contingencyMatrix.Row(k) == ch)
+                         ^
+mcfit.cpp:235:35: error: ‘ch’ was not declared in this scope
+    if(contingencyMatrix.Row(k) == ch)
+                                   ^
+mcfit.cpp:236:37: error: invalid use of ‘Rcpp::Matrix<14>::Row’
+     probsVector = contingencyMatrix.Row(k); 
+                                     ^
 make: *** [mcfit.o] Error 1
 g++ -I/usr/share/R/include -DNDEBUG    -I"/usr/local/lib/R/site-library/Rcpp/include" -I"/media/sf_GitHub/rtest/rcpp"    -fpic  -O3 -pipe  -g  -c mcfit.cpp -o mcfit.o
 Error in sourceCpp("mcfit.cpp") : 
