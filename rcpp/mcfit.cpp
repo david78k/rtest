@@ -105,13 +105,14 @@ NumericMatrix createSequenceMatrix_cpp(CharacterVector stringchar, bool toRowPro
   return (freqMatrix);
 }
 
-//template <typename T>
+template <typename T>
+T transpose(T & m) {      // tranpose for IntegerMatrix / NumericMatrix, see array.c in R
 //T transpose(const T & m) {      // tranpose for IntegerMatrix / NumericMatrix, see array.c in R
-NumericMatrix transpose(NumericMatrix & m) {      // tranpose for IntegerMatrix / NumericMatrix, see array.c in R
+//NumericMatrix transpose(NumericMatrix & m) {      // tranpose for IntegerMatrix / NumericMatrix, see array.c in R
   int k = m.rows(), n = m.cols();
   //Rcpp::Rcout << "Transposing " << n << " by " << k << std::endl;
-  //T z(n, k);
-  NumericMatrix z(n, k);
+  T z(n, k);
+  //NumericMatrix z(n, k);
   //CharacterVector rows = rownames(m);
   //CharacterVector cols = colnames(m);
   //List dimnms = List::create(CharacterVector::create(rownames(m), colnames(m));
@@ -122,8 +123,8 @@ NumericMatrix transpose(NumericMatrix & m) {      // tranpose for IntegerMatrix 
   //Rf_PrintValue(rownames(m));
   //Rf_PrintValue(rownames(z));
   int sz1 = n*k-1;
-  //typename T::iterator mit, zit;
-  NumericMatrix::iterator mit, zit;
+  //NumericMatrix::iterator mit, zit;
+  typename T::iterator mit, zit;
   for (mit = m.begin(), zit = z.begin(); mit != m.end(); mit++, zit += n) {
   	if (zit >= z.end()) zit -= sz1;
         *zit = *mit;
@@ -297,27 +298,26 @@ NumericMatrix markovchainFit_cpp(SEXP data, String method="mle", bool byrow=true
 //NumericMatrix markovchainFit_cpp(DataFrame data, String method="mle", bool byrow=true, int nboot=10, double laplacian=0, String name="", bool parallel=false) {
   NumericMatrix out;
   Rf_PrintValue(data);
-  if(Rf_inherits(data, "data.frame") || Rf_inherits(data, "matrix")) { 
-  	if(Rf_inherits(data, "data.frame")) 
-  		Rcout << "data.frame" << endl;
- 	else
-  		Rcout << "matrix" << endl;
-//  NumericMatrix outMc =_matr2Mc(data,laplacian);
   //if(class(data) %in% c("data.frame","matrix")) {
-/*
-  if(data.attr("class") == "data.frame" || data.attr("class") == "matrix") {
-    //Rcout << data.attr("class") << endl;
-    //#if data is a data.frame forced to matrix
-    //if(data.attr("class") == "data.frame") data =as.matrix(data);
-  //  CharacterMatrix data2;
-    //if(data.attr("class") == "data.frame") data2 =wrap(data);
-    //if(data.attr("class") == "data.frame") data =as.matrix(data);
-    //byrow assumes distinct observations (trajectiories) are per row
-    //otherwise transpose
-  //  if(!byrow) data = trans(data2);
-   // NumericMatrix outMc =_matr2Mc(data,laplacian);
-    //out<-list(estimate=outMc)
-*/
+  if(Rf_inherits(data, "data.frame") || Rf_inherits(data, "matrix")) { 
+	CharacterMatrix data2;
+    	//#if data is a data.frame forced to matrix
+    	//if(data.attr("class") == "data.frame") data =as.matrix(data);
+  	if(Rf_inherits(data, "data.frame")) {
+  		Rcout << "data.frame" << endl;
+		DataFrame df(data);
+  //		CharacterMatrix data2(df);
+  		//CharacterMatrix data2 = as<CharacterMatrix>(df);
+  		//CharacterMatrix data2 = as<CharacterMatrix>(data);
+		//data2 = CharacterMatrix(data);
+		//data2 = as<CharacterMatrix>(data);
+ 	} else
+  		Rcout << "matrix" << endl;
+    	//byrow assumes distinct observations (trajectiories) are per row
+    	//otherwise transpose
+  	if(!byrow) data = transpose(data2);
+   	// NumericMatrix outMc =_matr2Mc(data,laplacian);
+    	//out<-list(estimate=outMc)
   } else {
     if(method == "mle") out = _mcFitMle(data, byrow);
     if(method == "bootstrap") out = _mcFitBootStrap(data, nboot, byrow, parallel);
@@ -347,7 +347,7 @@ NumericMatrix simplemc(int N, int thin) {
 /*** R 
 library(microbenchmark)
 sequence <- c("a", "b", "a", "a", "a", "a", "b", "a", "b", "a", "b", "a", "a", "b", "b", "b", "a", "b")
-sequence <- data.frame(sequence)
+#sequence <- data.frame(sequence)
   markovchainFit_cpp(sequence)
 */
 /*

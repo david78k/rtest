@@ -310,3 +310,32 @@ The following object is masked from ‘package:base’:
 > 
 > library(Rcpp)
 > sourceCpp("mcfit.cpp")
+
+> library(microbenchmark)
+
+> sequence <- c("a", "b", "a", "a", "a", "a", "b", "a", 
++     "b", "a", "b", "a", "a", "b", "b", "b", "a", "b")
+
+> markovchainFit_cpp(sequence)
+ [1] "a" "b" "a" "a" "a" "a" "b" "a" "b" "a" "b" "a" "a" "b" "b" "b" "a" "b"
+          a         b
+a 0.4000000 0.6000000
+b 0.7142857 0.2857143
+    a         b
+a 0.4 0.7142857
+b 0.6 0.2857143
+Warning message:
+In fun(libname, pkgname) : no DISPLAY variable so Tk is not available
+> 
+> #sequence <- c("a", "b", "a", "a", "a", "a", "b", "a", "b", "a", "b", "a", "a", "b", "b", "b", "a")
+> #markovchainFit_cpp(sequence)
+> #mcfit(data = sequence)
+> # $estimate
+> #          a         b
+> #a 0.4444444 0.5555556
+> #b 0.7142857 0.2857143
+> 
+> 
+> proc.time()
+   user  system elapsed 
+ 14.599   3.021  17.985 
