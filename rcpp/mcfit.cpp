@@ -66,11 +66,16 @@ NumericMatrix createSequenceMatrix_cpp(CharacterVector stringchar, bool toRowPro
   //Rf_PrintValue(freqMatrix.names());
   CharacterVector rnames = rownames(freqMatrix);
 //  Rf_PrintValue(freqMatrix);
+  int posFrom, posTo;
   for(int i = 0; i < stringchar.size() - 1; i ++) {
-    int posFrom = find(rnames.begin(), rnames.end(), stringchar[i]) - rnames.begin();
-    int posTo = find(rnames.begin(), rnames.end(), stringchar[i + 1]) - rnames.begin();
+	for (int j = 0; j < rnames.size(); j ++) {
+		if(stringchar[i] == rnames[j]) posFrom = j;
+		if(stringchar[i + 1] == rnames[j]) posTo = j;
+	}
+    //int posFrom = find(rnames.begin(), rnames.end(), stringchar[i]) - rnames.begin();
+    //int posTo = find(rnames.begin(), rnames.end(), stringchar[i + 1]) - rnames.begin();
     //Rcout << stringchar[i] << "->" << stringchar[i + 1] << ": " << posFrom << " " << posTo << endl;
-    freqMatrix(posFrom,posTo)++;
+  	freqMatrix(posFrom,posTo)++;
     //freqMatrix[posFrom][posTo]=freqMatrix[posFrom][posTo]+1;
     //Rf_PrintValue(freqMatrix);
   }
@@ -140,10 +145,11 @@ List _mcFitMle(CharacterVector stringchar, bool byrow) {
   NumericMatrix outMc;
   //if(byrow==false) outMc = transpose(outMc);
   if(byrow==false) outMc = transpose(initialMatr);
-  //out = list(outMc);
-  List out(1);
-  out[0] = outMc;
-  return out;
+
+  return List::create(outMc);
+  //List out(1);
+  //out[0] = outMc;
+  //return out;
 }
 
 // .mcFitLaplacianSmooth<-function(stringchar,byrow,laplacian=0.01)
@@ -363,8 +369,9 @@ List markovchainFit_cpp(SEXP data, String method="mle", bool byrow=true, int nbo
   	if(!byrow) mat = transpose(mat);
    	NumericMatrix outMc =_matr2Mc(mat,laplacian);
     	//out<-list(estimate=outMc)
-	out = List(1);
-	out["estimate"] = outMc;
+ 	out = List::create(_["estimate"] = outMc);
+	//out = List(1);
+	//out["estimate"] = outMc;
   } else {
     if(method == "mle") out = _mcFitMle(data, byrow);
     if(method == "bootstrap") out = _mcFitBootStrap(data, nboot, byrow, parallel);
@@ -393,8 +400,8 @@ NumericMatrix simplemc(int N, int thin) {
 
 /*** R 
 library(microbenchmark)
-sequence <- c("a", "b", "a", "a", "a", "a", "b", "a", "b", "a", "b", "a", "a", "b", "b", "b", "a", "b")
-sequence <- data.frame(t(sequence))
+sequence <- c("a", "b", "a", "a", "a", "a", "b", "a", "b", "a", "b", "a", "a", "b", "b", "b", "a")
+#sequence <- data.frame(t(sequence))
   markovchainFit_cpp(sequence)
   #markovchainFit_cpp(sequence, byrow=FALSE)
 */
