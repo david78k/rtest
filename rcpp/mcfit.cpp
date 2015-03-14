@@ -60,10 +60,9 @@ NumericMatrix createSequenceMatrix_cpp(CharacterVector stringchar, bool toRowPro
   //Rcout << sizeMatr << endl;
   
   NumericMatrix freqMatrix(sizeMatr);
-  rownames(freqMatrix) = elements;
-  colnames(freqMatrix) = elements;
-  //Rf_PrintValue(rownames(freqMatrix));
-  //Rf_PrintValue(colnames(freqMatrix));
+  freqMatrix.attr("dimnames") = List::create(elements, elements); 
+//  Rf_PrintValue(rownames(freqMatrix));
+//  Rf_PrintValue(colnames(freqMatrix));
   //Rf_PrintValue(freqMatrix.names());
   CharacterVector rnames = rownames(freqMatrix);
 //  Rf_PrintValue(freqMatrix);
@@ -289,8 +288,44 @@ NumericMatrix _matr2Mc(CharacterMatrix matrData, double laplacian=0) {
 	Rcout << ' ' << *it;
   Rcout << endl;
 
+  NumericMatrix contingencyMatrix (uniqueVals.size(), uniqueVals.size());
+  contingencyMatrix.attr("dimnames") = List::create(uniqueVals, uniqueVals); 
   
+  set<string>::iterator it;
+  int stateBegin, stateEnd;
+  for(int i = 0; i < nRows; i ++) {
+	for(int j = 1; j < nCols; j ++) {
+		int k = 0;
+  		for(it=uniqueVals.begin(); it!=uniqueVals.end(); ++it, k++) {
+			if(*it == (string)matrData(i,j-1)) stateBegin = k;
+			if(*it == (string)matrData(i,j)) stateEnd = k;
+		}
+    //Rcout << stringchar[i] << "->" << stringchar[i + 1] << ": " << posFrom << " " << posTo << endl;
+    		contingencyMatrix(stateBegin,stateEnd)++;
+	}
+  }
+
+  //#add laplacian correction if needed
+  //contingencyMatrix=contingencyMatrix+laplacian
+  //NumericMatrix transitionMatrix (uniqueVals.size(), uniqueVals.size());
+  for(int i = 0; i < nRows; i ++) {
+	double rowSum = 0;
+	for(int j = 0; j < nCols; j ++) {
+    		contingencyMatrix(i,j) += laplacian;
+    		rowSum += contingencyMatrix(i,j);
+  	}
+  	//#get a transition matrix and a DTMC
+	for(int j = 0; j < nCols; j ++) 
+    		contingencyMatrix(i,j) /= rowSum;
+  }
+  //#get a transition matrix and a DTMC
+  //transitionMatrix<-contingencyMatrix/rowSums(contingencyMatrix);
+  //outMc<-new("markovchain",transitionMatrix=transitionMatrix);
+  
+  //Function newClass("new");
   NumericMatrix outMc;
+  //outMc = (NumericMatrix)newClass("markovchain", contingencyMatrix);
+  //outMc =new("markovchain",contingencyMatrix);
 
   return(outMc);
 }

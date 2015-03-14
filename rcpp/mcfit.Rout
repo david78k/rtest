@@ -313,23 +313,23 @@ The following object is masked from ‘package:base’:
 
 > library(microbenchmark)
 
-> sequence <- c("b", "a", "b", "a", "a", "a", "a", "b", 
-+     "a", "b", "a", "b", "a", "a", "b", "b", "b", "a", "b")
+> sequence <- c("a", "b", "a", "a", "a", "a", "b", "a", 
++     "b", "a", "b", "a", "a", "b", "b", "b", "a", "b")
 
 > sequence <- data.frame(t(sequence))
 
 > markovchainFit_cpp(sequence)
-  X1 X2 X3 X4 X5 X6 X7 X8 X9 X10 X11 X12 X13 X14 X15 X16 X17 X18 X19
-1  b  a  b  a  a  a  a  b  a   b   a   b   a   a   b   b   b   a   b
+  X1 X2 X3 X4 X5 X6 X7 X8 X9 X10 X11 X12 X13 X14 X15 X16 X17 X18
+1  a  b  a  a  a  a  b  a  b   a   b   a   a   b   b   b   a   b
 data.frame to matrix
      [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9] [,10] [,11] [,12] [,13] [,14]
-[1,] "b"  "a"  "b"  "a"  "a"  "a"  "a"  "b"  "a"  "b"   "a"   "b"   "a"   "a"  
-     [,15] [,16] [,17] [,18] [,19]
-[1,] "b"   "b"   "b"   "a"   "b"  
+[1,] "a"  "b"  "a"  "a"  "a"  "a"  "b"  "a"  "b"  "a"   "b"   "a"   "a"   "b"  
+     [,15] [,16] [,17] [,18]
+[1,] "b"   "b"   "a"   "b"  
      [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9] [,10] [,11] [,12] [,13] [,14]
-[1,] "b"  "a"  "b"  "a"  "a"  "a"  "a"  "b"  "a"  "b"   "a"   "b"   "a"   "a"  
-     [,15] [,16] [,17] [,18] [,19]
-[1,] "b"   "b"   "b"   "a"   "b"  
+[1,] "a"  "b"  "a"  "a"  "a"  "a"  "b"  "a"  "b"  "a"   "b"   "a"   "a"   "b"  
+     [,15] [,16] [,17] [,18]
+[1,] "b"   "b"   "a"   "b"  
 1
  a b
 [[1]]
@@ -346,10 +346,8 @@ In fun(libname, pkgname) : no DISPLAY variable so Tk is not available
 > #mcfit(data = sequence)
 > # $estimate
 > #          a         b
-> #a 0.4444444 0.5555556
-> #b 0.7142857 0.2857143
-> 
-> 
-> proc.time()
-   user  system elapsed 
- 12.118   2.635  14.928 
+
+ *** caught segfault ***
+address 0x18, cause 'memory not mapped'
+aborting ...
+Segmentation fault (core dumped)
