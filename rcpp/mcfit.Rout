@@ -323,65 +323,65 @@ BootStrap Estimate
  1 2 
  The transition matrix   (by rows)  is defined as follows 
           1         2
-1 0.4455808 0.5544192
-2 0.8035714 0.1964286
+1 0.4095058 0.5904942
+2 0.6913095 0.3086905
 
 
 $standardError
           [,1]      [,2]
-[1,] 0.1725614 0.1725614
-[2,] 0.2000921 0.2000921
+[1,] 0.1184772 0.1184772
+[2,] 0.1202545 0.1202545
 
 $bootStrapSamples
 $bootStrapSamples[[1]]
-      a     b
-a 0.375 0.625
-b 0.750 0.250
+          a         b
+a 0.4000000 0.6000000
+b 0.8333333 0.1666667
 
 $bootStrapSamples[[2]]
           a         b
-a 0.4545455 0.5454545
-b 1.0000000 0.0000000
+a 0.3333333 0.6666667
+b 0.5000000 0.5000000
 
 $bootStrapSamples[[3]]
-          a         b
-a 0.6363636 0.3636364
-b 1.0000000 0.0000000
+      a     b
+a 0.250 0.750
+b 0.875 0.125
 
 $bootStrapSamples[[4]]
-    a   b
-a 0.5 0.5
-b 0.5 0.5
+          a         b
+a 0.5454545 0.4545455
+b 0.8000000 0.2000000
 
 $bootStrapSamples[[5]]
           a         b
-a 0.4444444 0.5555556
-b 0.8571429 0.1428571
+a 0.2857143 0.7142857
+b 0.6666667 0.3333333
 
 $bootStrapSamples[[6]]
           a         b
 a 0.5555556 0.4444444
-b 0.7142857 0.2857143
+b 0.5714286 0.4285714
 
 $bootStrapSamples[[7]]
-          a         b
-a 0.4444444 0.5555556
-b 0.7142857 0.2857143
+      a     b
+a 0.375 0.625
+b 0.625 0.375
 
 $bootStrapSamples[[8]]
           a         b
-a 0.5454545 0.4545455
-b 1.0000000 0.0000000
+a 0.6000000 0.4000000
+b 0.6666667 0.3333333
 
 $bootStrapSamples[[9]]
-    a   b
-a 0.5 0.5
-b 1.0 0.0
+      a     b
+a 0.375 0.625
+b 0.750 0.250
 
 $bootStrapSamples[[10]]
-    a   b
-a 0.0 1.0
-b 0.5 0.5
+      a     b
+a 0.375 0.625
+b 0.625 0.375
 
 
 
@@ -393,6 +393,38 @@ BootStrap Estimate
  a b 
  The transition matrix   (by rows)  is defined as follows 
 numeric(0)
+
+
+$bootStrapSamples
+$bootStrapSamples[[1]]
+[1] "a"
+
+$bootStrapSamples[[2]]
+[1] "a"
+
+$bootStrapSamples[[3]]
+[1] "b"
+
+$bootStrapSamples[[4]]
+[1] "b"
+
+$bootStrapSamples[[5]]
+[1] "b"
+
+$bootStrapSamples[[6]]
+[1] "a"
+
+$bootStrapSamples[[7]]
+[1] "a"
+
+$bootStrapSamples[[8]]
+[1] "b"
+
+$bootStrapSamples[[9]]
+[1] "b"
+
+$bootStrapSamples[[10]]
+[1] "a"
 
 
 Warning message:
@@ -409,4 +441,4 @@ In fun(libname, pkgname) : no DISPLAY variable so Tk is not available
 > 
 > proc.time()
    user  system elapsed 
- 11.151   3.773  14.816 
+  9.088   2.109  11.192 

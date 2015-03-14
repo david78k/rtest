@@ -243,7 +243,8 @@ List _bootstrapCharacterSequences(CharacterVector stringchar, int n, int size=-1
 		//String char = sample(itemset, 1, true, probsVector);
  	}
 	//samples[[samples.size() + 1]] = charseq;
-	samples = List::create(samples, charseq);
+	samples.push_back(charseq);
+	//samples = List::create(clone(samples), charseq);
   }
 
   return samples;
@@ -303,7 +304,12 @@ List _mcFitBootStrap(CharacterVector data, int nboot=10, bool byrow=true, bool p
   return(out)
 */
   List theList = _bootstrapCharacterSequences(data, nboot);
- 
+  List pmsBootStrapped;
+
+  if(!parallel) pmsBootStrapped = theList;
+  else {
+		
+  }
   //estimateList<-.fromBoot2Estimate(listMatr=pmsBootStrapped)
   NumericMatrix transMatr;
 
@@ -314,7 +320,7 @@ List _mcFitBootStrap(CharacterVector data, int nboot=10, bool byrow=true, bool p
 
   return List::create(_["estimate"] = estimate
 		//, _["standardError"] = estimateList.attr("estSigma")
-		//, _["bootStrapSamples"] = pmsBootStrapped
+		, _["bootStrapSamples"] = pmsBootStrapped
 		);
 }
 
