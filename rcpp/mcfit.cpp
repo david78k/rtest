@@ -113,15 +113,8 @@ T transpose(T & m) {      // tranpose for IntegerMatrix / NumericMatrix, see arr
   //Rcpp::Rcout << "Transposing " << n << " by " << k << std::endl;
   T z(n, k);
   //NumericMatrix z(n, k);
-  //CharacterVector rows = rownames(m);
-  //CharacterVector cols = colnames(m);
-  //List dimnms = List::create(CharacterVector::create(rownames(m), colnames(m));
-  z.attr("dimnames") = List::create(rownames(m), colnames(m)); 
-  //z.attr("dimnames") = List::create(rows, cols); 
-  //rownames(z) = rownames(m);
-  //Rf_PrintValue(rows);
-  //Rf_PrintValue(rownames(m));
-  //Rf_PrintValue(rownames(z));
+  z.attr("dimnames") = List::create(colnames(m), rownames(m)); 
+  //z.attr("dimnames") = List::create(rownames(m), colnames(m)); 
   int sz1 = n*k-1;
   //NumericMatrix::iterator mit, zit;
   typename T::iterator mit, zit;
@@ -284,7 +277,11 @@ NumericMatrix _matr2Mc(SEXP matrData, double laplacian=0) {
   transitionMatrix<-contingencyMatrix/rowSums(contingencyMatrix)
   outMc<-new("markovchain",transitionMatrix=transitionMatrix)
 */
-  int nCols = as<CharacterMatrix>(matrData).ncol();
+  CharacterMatrix mat(matrData);
+  //int nCols = as<CharacterMatrix>(matrData).ncol();
+  int nCols = mat.ncol();
+  Rf_PrintValue(mat);
+  Rcout << nCols << endl;
   std::set<char> uniqueVals;
   NumericMatrix outMc;
 
@@ -300,23 +297,25 @@ NumericMatrix markovchainFit_cpp(SEXP data, String method="mle", bool byrow=true
   Rf_PrintValue(data);
   //if(class(data) %in% c("data.frame","matrix")) {
   if(Rf_inherits(data, "data.frame") || Rf_inherits(data, "matrix")) { 
-	CharacterMatrix data2;
+	CharacterMatrix mat;
     	//#if data is a data.frame forced to matrix
     	//if(data.attr("class") == "data.frame") data =as.matrix(data);
   	if(Rf_inherits(data, "data.frame")) {
-  		Rcout << "data.frame" << endl;
+  		Rcout << "data.frame to matrix" << endl;
 		DataFrame df(data);
+		//data2 = internal::convert_using_rfunction(df, "as.matrix");
+		Function asMatrix("as.matrix");
+		mat = asMatrix(df);
+		Rf_PrintValue(mat);
   //		CharacterMatrix data2(df);
-  		//CharacterMatrix data2 = as<CharacterMatrix>(df);
-  		//CharacterMatrix data2 = as<CharacterMatrix>(data);
-		//data2 = CharacterMatrix(data);
-		//data2 = as<CharacterMatrix>(data);
- 	} else
+ 	} else {
   		Rcout << "matrix" << endl;
+		mat = data;
+	}
     	//byrow assumes distinct observations (trajectiories) are per row
     	//otherwise transpose
-  	if(!byrow) data = transpose(data2);
-   	// NumericMatrix outMc =_matr2Mc(data,laplacian);
+  	if(!byrow) mat = transpose(mat);
+   	NumericMatrix outMc =_matr2Mc(mat,laplacian);
     	//out<-list(estimate=outMc)
   } else {
     if(method == "mle") out = _mcFitMle(data, byrow);
@@ -347,8 +346,9 @@ NumericMatrix simplemc(int N, int thin) {
 /*** R 
 library(microbenchmark)
 sequence <- c("a", "b", "a", "a", "a", "a", "b", "a", "b", "a", "b", "a", "a", "b", "b", "b", "a", "b")
-#sequence <- data.frame(sequence)
-  markovchainFit_cpp(sequence)
+sequence <- data.frame(t(sequence))
+  #markovchainFit_cpp(sequence)
+  markovchainFit_cpp(sequence, byrow=FALSE)
 */
 /*
 microbenchmark(

@@ -316,14 +316,35 @@ The following object is masked from ‘package:base’:
 > sequence <- c("a", "b", "a", "a", "a", "a", "b", "a", 
 +     "b", "a", "b", "a", "a", "b", "b", "b", "a", "b")
 
-> markovchainFit_cpp(sequence)
- [1] "a" "b" "a" "a" "a" "a" "b" "a" "b" "a" "b" "a" "a" "b" "b" "b" "a" "b"
-          a         b
-a 0.4000000 0.6000000
-b 0.7142857 0.2857143
-    a         b
-a 0.4 0.7142857
-b 0.6 0.2857143
+> sequence <- data.frame(t(sequence))
+
+> markovchainFit_cpp(sequence, byrow = FALSE)
+  X1 X2 X3 X4 X5 X6 X7 X8 X9 X10 X11 X12 X13 X14 X15 X16 X17 X18
+1  a  b  a  a  a  a  b  a  b   a   b   a   a   b   b   b   a   b
+data.frame to matrix
+     X1  X2  X3  X4  X5  X6  X7  X8  X9  X10 X11 X12 X13 X14 X15 X16 X17 X18
+[1,] "a" "b" "a" "a" "a" "a" "b" "a" "b" "a" "b" "a" "a" "b" "b" "b" "a" "b"
+    [,1]
+X1  "a" 
+X2  "b" 
+X3  "a" 
+X4  "a" 
+X5  "a" 
+X6  "a" 
+X7  "b" 
+X8  "a" 
+X9  "b" 
+X10 "a" 
+X11 "b" 
+X12 "a" 
+X13 "a" 
+X14 "b" 
+X15 "b" 
+X16 "b" 
+X17 "a" 
+X18 "b" 
+1
+numeric(0)
 Warning message:
 In fun(libname, pkgname) : no DISPLAY variable so Tk is not available
 > 
@@ -338,4 +359,4 @@ In fun(libname, pkgname) : no DISPLAY variable so Tk is not available
 > 
 > proc.time()
    user  system elapsed 
- 14.599   3.021  17.985 
+ 11.829   2.690  14.614 
