@@ -346,8 +346,10 @@ In fun(libname, pkgname) : no DISPLAY variable so Tk is not available
 > #mcfit(data = sequence)
 > # $estimate
 > #          a         b
-
- *** caught segfault ***
-address 0x18, cause 'memory not mapped'
-aborting ...
-Segmentation fault (core dumped)
+> #a 0.4444444 0.5555556
+> #b 0.7142857 0.2857143
+> 
+> 
+> proc.time()
+   user  system elapsed 
+  7.692   1.957   9.642 

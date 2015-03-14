@@ -288,7 +288,8 @@ NumericMatrix _matr2Mc(CharacterMatrix matrData, double laplacian=0) {
 	Rcout << ' ' << *it;
   Rcout << endl;
 
-  NumericMatrix contingencyMatrix (uniqueVals.size(), uniqueVals.size());
+  int usize = uniqueVals.size();
+  NumericMatrix contingencyMatrix (usize, usize);
   contingencyMatrix.attr("dimnames") = List::create(uniqueVals, uniqueVals); 
   
   set<string>::iterator it;
@@ -307,15 +308,16 @@ NumericMatrix _matr2Mc(CharacterMatrix matrData, double laplacian=0) {
 
   //#add laplacian correction if needed
   //contingencyMatrix=contingencyMatrix+laplacian
-  //NumericMatrix transitionMatrix (uniqueVals.size(), uniqueVals.size());
-  for(int i = 0; i < nRows; i ++) {
+  NumericMatrix transitionMatrix (usize, usize);
+  for(int i = 0; i < usize; i ++) {
 	double rowSum = 0;
-	for(int j = 0; j < nCols; j ++) {
+	for(int j = 0; j < usize; j ++) {
     		contingencyMatrix(i,j) += laplacian;
     		rowSum += contingencyMatrix(i,j);
   	}
   	//#get a transition matrix and a DTMC
-	for(int j = 0; j < nCols; j ++) 
+	for(int j = 0; j < usize; j ++) 
+    		//transitionMatrix(i,j) = contingencyMatrix(i,j)/rowSum;
     		contingencyMatrix(i,j) /= rowSum;
   }
   //#get a transition matrix and a DTMC
