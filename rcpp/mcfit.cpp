@@ -19,6 +19,7 @@ NumericVector rowSumsC(NumericMatrix x) {
 }
 
 // createSequenceMatrix<-function(stringchar, toRowProbs=FALSE,sanitize=TRUE)
+// [[Rcpp::export]]
 NumericMatrix createSequenceMatrix_cpp(CharacterVector stringchar, bool toRowProbs=false, bool sanitize=true) {
 //NumericMatrix createSequenceMatrix_cpp(DataFrame stringchar, bool toRowProbs=false, bool sanitize=true) {
 /* 
@@ -157,8 +158,7 @@ List _mcFitMle(CharacterVector stringchar, bool byrow) {
 }
 
 // .mcFitLaplacianSmooth<-function(stringchar,byrow,laplacian=0.01)
-List _mcFitLaplacianSmooth(DataFrame data, bool byrow, double laplacian=0.01) {
-  NumericMatrix mat(1, 1);
+List _mcFitLaplacianSmooth(CharacterVector stringchar, bool byrow, double laplacian=0.01) {
 /*
   origNum<-createSequenceMatrix(stringchar=stringchar,toRowProbs=FALSE)
 	sumOfRow<-rowSums(origNum)
@@ -171,6 +171,21 @@ List _mcFitLaplacianSmooth(DataFrame data, bool byrow, double laplacian=0.01) {
 	if(byrow==FALSE) outMc<-t(outMc)
 	out<-list(estimate=outMc)
 */
+  NumericMatrix origNum = createSequenceMatrix_cpp(stringchar, false);
+  int nRows = origNum.nrow(), nCols = origNum.ncol();
+  for(int i = 0; i < nRows; i ++) {
+	double rowSum = 0;
+	for(int j = 0; j < nCols; j ++) {
+    		origNum(i,j) += laplacian;
+    		rowSum += origNum(i,j);
+  	}
+  	//#get a transition matrix and a DTMC
+	for(int j = 0; j < nCols; j ++) 
+    		//transitionMatrix(i,j) = contingencyMatrix(i,j)/rowSum;
+    		origNum(i,j) /= rowSum;
+  }
+  //#get a transition matrix and a DTMC
+  
   List out(1);
   return out;
 }
@@ -385,8 +400,10 @@ List markovchainFit_cpp(SEXP data, String method="mle", bool byrow=true, int nbo
     if(method == "laplace") out = _mcFitLaplacianSmooth(data, byrow, laplacian);
   }
 //  if(!missing(name)) out$estimate@name<-name
-  S4 estimate = out["estimate"];
-  estimate.slot("name") = name;
+  if(name != "") {
+    S4 estimate = out["estimate"];
+    estimate.slot("name") = name;
+  }
   //((S4)(out["estimate"])).slot("name") = name;
   //if(!name.empty()) ((S4)out["estimate"]).slot("name") = name;
   return out;
@@ -413,10 +430,13 @@ NumericMatrix simplemc(int N, int thin) {
 /*** R 
 library(microbenchmark)
 sequence <- c("a", "b", "a", "a", "a", "a", "b", "a", "b", "a", "b", "a", "a", "b", "b", "b", "a")
-#sequence <- data.frame(t(sequence))
+sequence <- data.frame(t(sequence))
 #microbenchmark(
-#  markovchainFit(data = sequence),
-  markovchainFit_cpp(sequence)
+  #markovchainFit(data = sequence)#,
+  markovchainFit(data = sequence, method="laplace")#,
+  #markovchainFit(data = sequence, byrow=FALSE)#,
+  #markovchainFit_cpp(sequence)
+  markovchainFit_cpp(sequence, "laplace")
   #markovchainFit_cpp(sequence, byrow=FALSE)
 #)
 */
