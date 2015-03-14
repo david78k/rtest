@@ -181,13 +181,17 @@ List _mcFitLaplacianSmooth(CharacterVector stringchar, bool byrow, double laplac
   	}
   	//#get a transition matrix and a DTMC
 	for(int j = 0; j < nCols; j ++) 
-    		//transitionMatrix(i,j) = contingencyMatrix(i,j)/rowSum;
     		origNum(i,j) /= rowSum;
   }
-  //#get a transition matrix and a DTMC
   
-  List out(1);
-  return out;
+  if(byrow==false) origNum = transpose(origNum);
+//  Rf_PrintValue(origNum);
+ 
+  S4 outMc("markovchain");
+  outMc.slot("transitionMatrix") = origNum;
+  outMc.slot("name") = "Laplacian Smooth Fit";  
+
+  return List::create(_["estimate"] = outMc);
 }
 
 // .bootstrapCharacterSequences<-function(stringchar, n, size=length(stringchar))
@@ -430,13 +434,13 @@ NumericMatrix simplemc(int N, int thin) {
 /*** R 
 library(microbenchmark)
 sequence <- c("a", "b", "a", "a", "a", "a", "b", "a", "b", "a", "b", "a", "a", "b", "b", "b", "a")
-sequence <- data.frame(t(sequence))
+#sequence <- data.frame(t(sequence))
 #microbenchmark(
   #markovchainFit(data = sequence)#,
-  markovchainFit(data = sequence, method="laplace")#,
+  markovchainFit(data = sequence, method="laplace", laplacian=0.1)#,
   #markovchainFit(data = sequence, byrow=FALSE)#,
   #markovchainFit_cpp(sequence)
-  markovchainFit_cpp(sequence, "laplace")
+  markovchainFit_cpp(sequence, "laplace", laplacian=0.1)
   #markovchainFit_cpp(sequence, byrow=FALSE)
 #)
 */
