@@ -1,4 +1,7 @@
 #include <Rcpp.h>
+#include <omp.h>
+#include <unistd.h>
+//#include <Environment.h>
 //#include <RcppArmadillo.h>
 //// [[Rcpp::depends(RcppArmadillo)]]
 
@@ -36,6 +39,7 @@ NumericMatrix _toRowProbs(NumericMatrix x) {
     for (int j = 0; j < ncol; j++) 
       out(i, j) = x(i, j)/rowSum;
   }
+  out.attr("dimnames") = List::create(rownames(x), colnames(x)); 
   return out;
 }
 
@@ -299,7 +303,7 @@ List _fromBoot2Estimate(List listMatr) {
   int sampleSize = listMatr.size();
   NumericMatrix firstMat = listMatr[0];
   int matrDim = firstMat.nrow();
-  Rcout << matrDim << endl;
+  //Rcout << matrDim << endl;
   NumericMatrix matrMean(matrDim);
   NumericMatrix matrSd(matrDim);
 
@@ -336,15 +340,15 @@ List _mcFitBootStrap(CharacterVector data, int nboot=10, bool byrow=true, bool p
 	if(!parallel)
 		#convert the list in a probability matrix
 		pmsBootStrapped<-lapply(X=theList, FUN=createSequenceMatrix, toRowProbs=TRUE,sanitize=TRUE)
-		 else {
+	 else {
 		#require(parallel)
 		type <- if(exists("mcfork", mode = "function")) "FORK" else "PSOCK"
 		cores <- getOption("mc.cores", detectCores())
 		cl <- makeCluster(cores, type = type)
-			clusterExport(cl, varlist = c("createSequenceMatrix","zeros"))
-			pmsBootStrapped<-parLapply(cl=cl, X=theList, fun="createSequenceMatrix", toRowProbs=TRUE,sanitize=TRUE)
+		clusterExport(cl, varlist = c("createSequenceMatrix","zeros"))
+		pmsBootStrapped<-parLapply(cl=cl, X=theList, fun="createSequenceMatrix", toRowProbs=TRUE,sanitize=TRUE)
 		stopCluster(cl)
-	}
+	 }
  
   estimateList<-.fromBoot2Estimate(listMatr=pmsBootStrapped)
   #from raw to estimate
@@ -367,7 +371,21 @@ List _mcFitBootStrap(CharacterVector data, int nboot=10, bool byrow=true, bool p
 //		Rf_PrintValue(pmsBootStrapped[i]);
 	}
   } else {
-		
+	String type;
+//	if(Rf_findFun("mcfork", R_GlobalEnv)) 
+	//if(exists("mcfork"))
+	//SEXP nameSym = Rf_install("mcfork");
+	//SEXP res = Rf_findVarInFrame( String::get__() , nameSym  ) ;
+	//if(res != R_UnboundValue)
+		//type = "FORK"; else "PSOCK";			
+	int cores = sysconf(_SC_NPROCESSORS_ONLN);
+	Rcout << "cores: " << cores << endl;
+	//omp_set_num_threads(cores);
+	//pragrma
+	for(int i = 0; i < n; i ++) {
+		pmsBootStrapped[i] = createSequenceMatrix_cpp(theList[i], true, true);
+		//Rf_PrintValue(pmsBootStrapped[i]);
+	}
   }
   //estimateList<-.fromBoot2Estimate(listMatr=pmsBootStrapped)
   List estimateList = _fromBoot2Estimate(pmsBootStrapped);
@@ -491,7 +509,8 @@ S4 _matr2Mc(CharacterMatrix matrData, double laplacian=0) {
 
 // markovchainFit<-function(data,method="mle", byrow=TRUE,nboot=10,laplacian=0, name, parallel=FALSE)
 // [[Rcpp::export]]
-List markovchainFit_cpp(SEXP data, String method="mle", bool byrow=true, int nboot=10, double laplacian=0, String name="", bool parallel=false) {
+List markovchainFit_cpp(SEXP data, String method="mle", bool byrow=true, int nboot=10, double laplacian=0, String name="", bool parallel=true) {
+//List markovchainFit_cpp(SEXP data, String method="mle", bool byrow=true, int nboot=10, double laplacian=0, String name="", bool parallel=false) {
 //List markovchainFit_cpp(SEXP data, String method="mle", bool byrow=true, int nboot=10, double laplacian=0, String name="", bool parallel=false) {
 //NumericMatrix markovchainFit_cpp(DataFrame data, String method="mle", bool byrow=true, int nboot=10, double laplacian=0, String name="", bool parallel=false) {
   List out;
