@@ -243,6 +243,7 @@ List _bootstrapCharacterSequences(CharacterVector stringchar, int n, int size=-1
   int itemsetsize = itemset.size();
   //Rf_PrintValue(itemset);
 
+  Function sample("sample");
   srand(time(NULL));
   for(int i = 0; i < n; i ++) {
 	CharacterVector charseq;	
@@ -250,7 +251,10 @@ List _bootstrapCharacterSequences(CharacterVector stringchar, int n, int size=-1
  	String ch = itemset[rnd];
 	//Rcout << rnd << " " << itemset[rnd] << endl;
 	//Rf_PrintValue(ch);
-	charseq.push_back(ch);
+	List res = sample(itemset, 1);
+	CharacterVector cv = res[0];
+	charseq.push_back(cv[0]);
+	//charseq.push_back(ch);
 	//Rf_PrintValue(charseq);
 	for(int j = 1; j < size; j ++) {
 		NumericVector probsVector;
@@ -261,11 +265,19 @@ List _bootstrapCharacterSequences(CharacterVector stringchar, int n, int size=-1
 				//Rf_PrintValue(probsVector);
 				break;
 			}
-		//String char = sample(itemset, 1, true, probsVector);
   		//srand(time(NULL));
 		rnd = rand()%itemsetsize;
  		ch = itemset[rnd];
-		charseq.push_back(ch);
+		res = sample(itemset, 1, true, probsVector);
+		//SEXP character = sample(itemset, 1, true, probsVector);
+		//Rcout << res[0] << endl;
+		//Rcout << "res[0]" << endl;
+		//Rf_PrintValue(res[0]);
+		CharacterVector v = res[0];
+		//Rf_PrintValue(res[0]);
+		//Rf_PrintValue(character);
+		charseq.push_back(v[0]);
+		//charseq.push_back(ch);
  	}
 	//samples[[samples.size() + 1]] = charseq;
 	samples.push_back(charseq);
