@@ -5,7 +5,41 @@
 using namespace Rcpp;
 using namespace std;
 
-NumericVector rowSumsC(NumericMatrix x) {
+template <typename T>
+T _transpose(T & m) {      // tranpose for IntegerMatrix / NumericMatrix, see array.c in R
+//T transpose(const T & m) {      // tranpose for IntegerMatrix / NumericMatrix, see array.c in R
+//NumericMatrix transpose(NumericMatrix & m) {      // tranpose for IntegerMatrix / NumericMatrix, see array.c in R
+  int k = m.rows(), n = m.cols();
+  //Rcpp::Rcout << "Transposing " << n << " by " << k << std::endl;
+  T z(n, k);
+  //NumericMatrix z(n, k);
+  z.attr("dimnames") = List::create(colnames(m), rownames(m)); 
+  //z.attr("dimnames") = List::create(rownames(m), colnames(m)); 
+  int sz1 = n*k-1;
+  //NumericMatrix::iterator mit, zit;
+  typename T::iterator mit, zit;
+  for (mit = m.begin(), zit = z.begin(); mit != m.end(); mit++, zit += n) {
+  	if (zit >= z.end()) zit -= sz1;
+        *zit = *mit;
+  }
+  return(z);
+}
+
+NumericMatrix _toRowProbs(NumericMatrix x) {
+  int nrow = x.nrow(), ncol = x.ncol();
+  NumericMatrix out(nrow);
+
+  for (int i = 0; i < nrow; i++) {
+    double rowSum = 0;
+    for (int j = 0; j < ncol; j++) 
+      rowSum += x(i, j);
+    for (int j = 0; j < ncol; j++) 
+      out(i, j) = x(i, j)/rowSum;
+  }
+  return out;
+}
+
+NumericVector _rowSumsC(NumericMatrix x) {
   int nrow = x.nrow(), ncol = x.ncol();
   NumericVector out(nrow);
 
@@ -98,36 +132,18 @@ NumericMatrix createSequenceMatrix_cpp(CharacterVector stringchar, bool toRowPro
   if(toRowProbs==true)
   {
     //freqMatrix<-freqMatrix/rowSums(freqMatrix)
-	for (int i = 0; i < sizeMatr; i++) {
+	freqMatrix = _toRowProbs(freqMatrix);
+/*	for (int i = 0; i < sizeMatr; i++) {
     		double rowSum = 0;
     		for (int j = 0; j < sizeMatr; j++) 
       			rowSum += freqMatrix(i, j);
     		for (int j = 0; j < sizeMatr; j++) 
       			freqMatrix(i, j) /= rowSum;
 	}
+*/
   }
 
   return (freqMatrix);
-}
-
-template <typename T>
-T transpose(T & m) {      // tranpose for IntegerMatrix / NumericMatrix, see array.c in R
-//T transpose(const T & m) {      // tranpose for IntegerMatrix / NumericMatrix, see array.c in R
-//NumericMatrix transpose(NumericMatrix & m) {      // tranpose for IntegerMatrix / NumericMatrix, see array.c in R
-  int k = m.rows(), n = m.cols();
-  //Rcpp::Rcout << "Transposing " << n << " by " << k << std::endl;
-  T z(n, k);
-  //NumericMatrix z(n, k);
-  z.attr("dimnames") = List::create(colnames(m), rownames(m)); 
-  //z.attr("dimnames") = List::create(rownames(m), colnames(m)); 
-  int sz1 = n*k-1;
-  //NumericMatrix::iterator mit, zit;
-  typename T::iterator mit, zit;
-  for (mit = m.begin(), zit = z.begin(); mit != m.end(); mit++, zit += n) {
-  	if (zit >= z.end()) zit -= sz1;
-        *zit = *mit;
-  }
-  return(z);
 }
 
 // .mcFitMle<-function(stringchar,byrow)
@@ -144,7 +160,7 @@ List _mcFitMle(CharacterVector stringchar, bool byrow) {
 //  Rf_PrintValue(initialMatr);
   
   //if(byrow==false) outMc = transpose(outMc);
-  if(byrow==false) initialMatr = transpose(initialMatr);
+  if(byrow==false) initialMatr = _transpose(initialMatr);
 
   //NumericMatrix outMc(initialMatr); //("markovchain", initialMatr,"MLE Fit");
   S4 outMc("markovchain");
@@ -184,7 +200,7 @@ List _mcFitLaplacianSmooth(CharacterVector stringchar, bool byrow, double laplac
     		origNum(i,j) /= rowSum;
   }
   
-  if(byrow==false) origNum = transpose(origNum);
+  if(byrow==false) origNum = _transpose(origNum);
 //  Rf_PrintValue(origNum);
  
   S4 outMc("markovchain");
@@ -256,7 +272,7 @@ List _bootstrapCharacterSequences(CharacterVector stringchar, int n, int size=-1
 }
 
 // .fromBoot2Estimate<-function(listMatr)
-void _fromBoot2Estimate() {
+List _fromBoot2Estimate(List listMatr) {
 /*
   sampleSize<-length(listMatr)
   matrDim<-nrow(listMatr[[1]])
@@ -280,6 +296,25 @@ void _fromBoot2Estimate() {
 	out<-list(estMu=matrMean, estSigma=matrSd)
     return(out)
 */
+  int sampleSize = listMatr.size();
+  NumericMatrix firstMat = listMatr[0];
+  int matrDim = firstMat.nrow();
+  Rcout << matrDim << endl;
+  NumericMatrix matrMean(matrDim);
+  NumericMatrix matrSd(matrDim);
+
+  for(int i = 0; i < matrDim; i ++) { 
+  	for(int j = 0; j < matrDim; j ++) { 
+		NumericVector probsEstimated;
+		for(int k = 0; k < sampleSize; k ++) {
+			NumericMatrix mat = listMatr[k];
+			probsEstimated.push_back(mat(i,j));
+			matrMean(i,j) = mean(probsEstimated);
+			matrSd(i,j) = sd(probsEstimated);
+		}
+  	}
+  }
+  return List::create(_["estMu"]=matrMean, _["estSigma"]=matrSd);
 }
 
 List lapply(List input, Function f) {
@@ -321,29 +356,46 @@ List _mcFitBootStrap(CharacterVector data, int nboot=10, bool byrow=true, bool p
 */
   List theList = _bootstrapCharacterSequences(data, nboot);
   int n = theList.size();
-  Rcout << "theList.size() " << n << endl;
-  List pmsBootStrapped;
+  //Rcout << "theList.size() " << n << endl;
+  List pmsBootStrapped(theList.size());
   //List pmsBootStrapped(theList.size());
 
   //if(!parallel) pmsBootStrapped = theList;
   if(!parallel) { //pmsBootStrapped = lapply(theList, createSequenceMatrix_cpp, true, true);
 	for(int i = 0; i < n; i++) { 
 		pmsBootStrapped[i] = createSequenceMatrix_cpp(theList[i], true, true);
-		Rf_PrintValue(pmsBootStrapped[i]);
+//		Rf_PrintValue(pmsBootStrapped[i]);
 	}
   } else {
 		
   }
   //estimateList<-.fromBoot2Estimate(listMatr=pmsBootStrapped)
-  NumericMatrix transMatr;
+  List estimateList = _fromBoot2Estimate(pmsBootStrapped);
+  //NumericMatrix temp = estimateList["estMu"];
+  NumericMatrix transMatr = _toRowProbs(estimateList["estMu"]);
+  //int size = temp.nrow();
 
+  //NumericMatrix transMatr = _toRowProbs(temp);
+  //NumericMatrix transMatr(size);//= sweep(temp, 1, rowSumsC(temp), FUN="/");
+/*
+  for(int i = 0; i < size; i ++) {
+	double rowSum = 0;
+  	for(int j = 0; j < size; j ++) 
+		rowSum += temp(i, j);
+  	for(int j = 0; j < size; j ++) 
+		temp(i, j) /= rowSum;
+  }
+  transMatr = temp;
+*/
   S4 estimate("markovchain");
   estimate.slot("transitionMatrix") = transMatr;
   estimate.slot("byrow") = byrow;
   estimate.slot("name") = "BootStrap Estimate";  
 
+  //Rcout << "bootStrapSamples.size() " << pmsBootStrapped.size() << endl;
+
   return List::create(_["estimate"] = estimate
-		//, _["standardError"] = estimateList.attr("estSigma")
+		, _["standardError"] = estimateList["estSigma"]
 		, _["bootStrapSamples"] = pmsBootStrapped
 		);
 }
@@ -465,7 +517,7 @@ List markovchainFit_cpp(SEXP data, String method="mle", bool byrow=true, int nbo
 	}
     	//byrow assumes distinct observations (trajectiories) are per row
     	//otherwise transpose
-  	if(!byrow) mat = transpose(mat);
+  	if(!byrow) mat = _transpose(mat);
    	S4 outMc =_matr2Mc(mat,laplacian);
     	//out<-list(estimate=outMc)
  	out = List::create(_["estimate"] = outMc);

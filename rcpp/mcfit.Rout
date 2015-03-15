@@ -323,111 +323,137 @@ BootStrap Estimate
  1 2 
  The transition matrix   (by rows)  is defined as follows 
           1         2
-1 0.3938600 0.6061400
-2 0.7444841 0.2555159
+1 0.3927201 0.6072799
+2 0.7503968 0.2496032
 
 
 $standardError
           [,1]      [,2]
-[1,] 0.1783937 0.1783937
-[2,] 0.1477857 0.1477857
+[1,] 0.1952776 0.1952776
+[2,] 0.1646511 0.1646511
 
 $bootStrapSamples
 $bootStrapSamples[[1]]
-          a         b
-a 0.7272727 0.2727273
-b 0.8000000 0.2000000
+     a    b
+a 0.25 0.75
+b 0.75 0.25
 
 $bootStrapSamples[[2]]
           a         b
-a 0.5000000 0.5000000
-b 0.8333333 0.1666667
+a 0.1666667 0.8333333
+b 0.6000000 0.4000000
 
 $bootStrapSamples[[3]]
-      a     b
-a 0.375 0.625
-b 0.750 0.250
+          a         b
+a 0.6666667 0.3333333
+b 0.4285714 0.5714286
 
 $bootStrapSamples[[4]]
           a         b
 a 0.4444444 0.5555556
-b 0.7142857 0.2857143
+b 0.8571429 0.1428571
 
 $bootStrapSamples[[5]]
-      a     b
-a 0.375 0.625
-b 0.625 0.375
+          a         b
+a 0.5454545 0.4545455
+b 0.8000000 0.2000000
 
 $bootStrapSamples[[6]]
           a         b
-a 0.5454545 0.4545455
-b 1.0000000 0.0000000
+a 0.1666667 0.8333333
+b 0.6000000 0.4000000
 
 $bootStrapSamples[[7]]
           a         b
 a 0.1428571 0.8571429
-b 0.6666667 0.3333333
+b 0.7777778 0.2222222
 
 $bootStrapSamples[[8]]
           a         b
-a 0.4000000 0.6000000
-b 0.8333333 0.1666667
+a 0.4444444 0.5555556
+b 0.8571429 0.1428571
 
 $bootStrapSamples[[9]]
           a         b
-a 0.2857143 0.7142857
-b 0.4444444 0.5555556
+a 0.6000000 0.4000000
+b 0.8333333 0.1666667
 
 $bootStrapSamples[[10]]
-          a         b
-a 0.1428571 0.8571429
-b 0.7777778 0.2222222
+    a   b
+a 0.5 0.5
+b 1.0 0.0
 
 
 
 > markovchainFit_cpp(sequence, "bootstrap")
 [1] "a" "b"
-theList.size() 10
-      a     b
-a 0.500 0.500
-b 0.625 0.375
-          a         b
-a 0.4285714 0.5714286
-b 0.5555556 0.4444444
-          a         b
-a 0.4285714 0.5714286
-b 0.5555556 0.4444444
-          a         b
-a 0.6666667 0.3333333
-b 0.7500000 0.2500000
-          a         b
-a 0.2857143 0.7142857
-b 0.5555556 0.4444444
-          a         b
-a 0.1666667 0.8333333
-b 0.4000000 0.6000000
-          a         b
-a 0.3333333 0.6666667
-b 0.1538462 0.8461538
-          a         b
-a 0.4285714 0.5714286
-b 0.4444444 0.5555556
-          a         b
-a 0.6000000 0.4000000
-b 0.6666667 0.3333333
-    a   b
-a 0.5 0.5
-b 0.5 0.5
+2
 $estimate
 BootStrap Estimate 
- A  - dimensional discrete Markov Chain with following states 
+ A  2 - dimensional discrete Markov Chain with following states 
  a b 
  The transition matrix   (by rows)  is defined as follows 
-numeric(0)
+          [,1]      [,2]
+[1,] 0.4403860 0.5596140
+[2,] 0.5263312 0.4736688
 
+
+$standardError
+          [,1]      [,2]
+[1,] 0.1973676 0.1973676
+[2,] 0.1600177 0.1600177
 
 $bootStrapSamples
-list()
+$bootStrapSamples[[1]]
+      [,1]  [,2]
+[1,] 0.500 0.500
+[2,] 0.625 0.375
+
+$bootStrapSamples[[2]]
+          [,1]      [,2]
+[1,] 0.0000000 1.0000000
+[2,] 0.5454545 0.4545455
+
+$bootStrapSamples[[3]]
+     [,1] [,2]
+[1,] 0.50 0.50
+[2,] 0.25 0.75
+
+$bootStrapSamples[[4]]
+      [,1]  [,2]
+[1,] 0.375 0.625
+[2,] 0.500 0.500
+
+$bootStrapSamples[[5]]
+          [,1]      [,2]
+[1,] 0.4444444 0.5555556
+[2,] 0.7142857 0.2857143
+
+$bootStrapSamples[[6]]
+          [,1]      [,2]
+[1,] 0.7272727 0.2727273
+[2,] 0.8000000 0.2000000
+
+$bootStrapSamples[[7]]
+          [,1]      [,2]
+[1,] 0.4285714 0.5714286
+[2,] 0.5555556 0.4444444
+
+$bootStrapSamples[[8]]
+          [,1]      [,2]
+[1,] 0.4285714 0.5714286
+[2,] 0.4444444 0.5555556
+
+$bootStrapSamples[[9]]
+          [,1]      [,2]
+[1,] 0.6666667 0.3333333
+[2,] 0.4285714 0.5714286
+
+$bootStrapSamples[[10]]
+          [,1]      [,2]
+[1,] 0.3333333 0.6666667
+[2,] 0.4000000 0.6000000
+
 
 Warning message:
 In fun(libname, pkgname) : no DISPLAY variable so Tk is not available
@@ -443,4 +469,4 @@ In fun(libname, pkgname) : no DISPLAY variable so Tk is not available
 > 
 > proc.time()
    user  system elapsed 
-  8.997   2.007  10.994 
+ 10.872   2.952  13.665 
