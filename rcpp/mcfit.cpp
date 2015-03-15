@@ -241,7 +241,7 @@ List _bootstrapCharacterSequences(CharacterVector stringchar, int n, int size=-1
   List samples;
   CharacterVector itemset = rownames(contingencyMatrix);
   int itemsetsize = itemset.size();
-  Rf_PrintValue(itemset);
+  //Rf_PrintValue(itemset);
 
   srand(time(NULL));
   for(int i = 0; i < n; i ++) {
@@ -381,7 +381,7 @@ List _mcFitBootStrap(CharacterVector data, int nboot=10, bool byrow=true, bool p
 	int cores = sysconf(_SC_NPROCESSORS_ONLN);
 	Rcout << "cores: " << cores << endl;
 	//omp_set_num_threads(cores);
-	//pragrma
+	#pragma omp parallel for
 	for(int i = 0; i < n; i ++) {
 		pmsBootStrapped[i] = createSequenceMatrix_cpp(theList[i], true, true);
 		//Rf_PrintValue(pmsBootStrapped[i]);
@@ -509,10 +509,8 @@ S4 _matr2Mc(CharacterMatrix matrData, double laplacian=0) {
 
 // markovchainFit<-function(data,method="mle", byrow=TRUE,nboot=10,laplacian=0, name, parallel=FALSE)
 // [[Rcpp::export]]
-List markovchainFit_cpp(SEXP data, String method="mle", bool byrow=true, int nboot=10, double laplacian=0, String name="", bool parallel=true) {
-//List markovchainFit_cpp(SEXP data, String method="mle", bool byrow=true, int nboot=10, double laplacian=0, String name="", bool parallel=false) {
-//List markovchainFit_cpp(SEXP data, String method="mle", bool byrow=true, int nboot=10, double laplacian=0, String name="", bool parallel=false) {
-//NumericMatrix markovchainFit_cpp(DataFrame data, String method="mle", bool byrow=true, int nboot=10, double laplacian=0, String name="", bool parallel=false) {
+List markovchainFit_cpp(SEXP data, String method="mle", bool byrow=true, int nboot=10, double laplacian=0, String name="", bool parallel=false) {
+//List markovchainFit_cpp(SEXP data, String method="mle", bool byrow=true, int nboot=10, double laplacian=0, String name="", bool parallel=true) {
   List out;
  // Rf_PrintValue(data);
   //if(class(data) %in% c("data.frame","matrix")) {
