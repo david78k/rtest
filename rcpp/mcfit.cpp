@@ -371,7 +371,7 @@ List _mcFitBootStrap(CharacterVector data, int nboot=10, bool byrow=true, bool p
 //		Rf_PrintValue(pmsBootStrapped[i]);
 	}
   } else {
-	String type;
+	//String type;
 //	if(Rf_findFun("mcfork", R_GlobalEnv)) 
 	//if(exists("mcfork"))
 	//SEXP nameSym = Rf_install("mcfork");
@@ -379,8 +379,9 @@ List _mcFitBootStrap(CharacterVector data, int nboot=10, bool byrow=true, bool p
 	//if(res != R_UnboundValue)
 		//type = "FORK"; else "PSOCK";			
 	int cores = sysconf(_SC_NPROCESSORS_ONLN);
-	Rcout << "cores: " << cores << endl;
-	//omp_set_num_threads(cores);
+//	Rcout << "cores: " << cores << endl;
+	//omp_set_dynamic(0);
+	omp_set_num_threads(cores);
 	#pragma omp parallel for
 	for(int i = 0; i < n; i ++) {
 		pmsBootStrapped[i] = createSequenceMatrix_cpp(theList[i], true, true);
