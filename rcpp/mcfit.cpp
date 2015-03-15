@@ -238,6 +238,8 @@ List _bootstrapCharacterSequences(CharacterVector stringchar, int n, int size=-1
 */
   if(size == -1) size = stringchar.size();
   NumericMatrix contingencyMatrix = createSequenceMatrix_cpp(stringchar);
+//  Rf_PrintValue(contingencyMatrix);
+
   List samples;
   CharacterVector itemset = rownames(contingencyMatrix);
   int itemsetsize = itemset.size();
@@ -253,6 +255,7 @@ List _bootstrapCharacterSequences(CharacterVector stringchar, int n, int size=-1
 	//Rf_PrintValue(ch);
 	List res = sample(itemset, 1);
 	CharacterVector cv = res[0];
+	ch = cv[0];
 	charseq.push_back(cv[0]);
 	//charseq.push_back(ch);
 	//Rf_PrintValue(charseq);
@@ -283,6 +286,8 @@ List _bootstrapCharacterSequences(CharacterVector stringchar, int n, int size=-1
 	samples.push_back(charseq);
 	//samples = List::create(clone(samples), charseq);
   }
+
+  //Rf_PrintValue(samples);
 
   return samples;
 }
@@ -325,11 +330,13 @@ List _fromBoot2Estimate(List listMatr) {
 		for(int k = 0; k < sampleSize; k ++) {
 			NumericMatrix mat = listMatr[k];
 			probsEstimated.push_back(mat(i,j));
-			matrMean(i,j) = mean(probsEstimated);
-			matrSd(i,j) = sd(probsEstimated);
 		}
+		matrMean(i,j) = mean(probsEstimated);
+		matrSd(i,j) = sd(probsEstimated);
   	}
   }
+  matrMean.attr("dimnames") = List::create(rownames(firstMat), colnames(firstMat)); 
+  matrSd.attr("dimnames") = matrMean.attr("dimnames");
   return List::create(_["estMu"]=matrMean, _["estSigma"]=matrSd);
 }
 
@@ -373,7 +380,7 @@ List _mcFitBootStrap(CharacterVector data, int nboot=10, bool byrow=true, bool p
   List theList = _bootstrapCharacterSequences(data, nboot);
   int n = theList.size();
   //Rcout << "theList.size() " << n << endl;
-  List pmsBootStrapped(theList.size());
+  List pmsBootStrapped(n);
   //List pmsBootStrapped(theList.size());
 
   //if(!parallel) pmsBootStrapped = theList;
@@ -402,12 +409,15 @@ List _mcFitBootStrap(CharacterVector data, int nboot=10, bool byrow=true, bool p
   }
   //estimateList<-.fromBoot2Estimate(listMatr=pmsBootStrapped)
   List estimateList = _fromBoot2Estimate(pmsBootStrapped);
-  //NumericMatrix temp = estimateList["estMu"];
   NumericMatrix transMatr = _toRowProbs(estimateList["estMu"]);
+  Rf_PrintValue(transMatr);
   //int size = temp.nrow();
-
-  //NumericMatrix transMatr = _toRowProbs(temp);
-  //NumericMatrix transMatr(size);//= sweep(temp, 1, rowSumsC(temp), FUN="/");
+  
+  //NumericMatrix temp = estimateList["estMu"];
+  //Function sweep("sweep");
+  //NumericMatrix transMatr2 = sweep(temp, 1, _rowSumsC(temp), "/");
+  //Rf_PrintValue(transMatr2);
+  
 /*
   for(int i = 0; i < size; i ++) {
 	double rowSum = 0;

@@ -323,50 +323,50 @@ BootStrap Estimate
  1 2 
  The transition matrix   (by rows)  is defined as follows 
           1         2
-1 0.5413636 0.4586364
-2 0.7832143 0.2167857
+1 0.4740731 0.5259269
+2 0.7742063 0.2257937
 
 
 $standardError
           [,1]      [,2]
-[1,] 0.1619842 0.1619842
-[2,] 0.1949770 0.1949770
+[1,] 0.2194078 0.2194078
+[2,] 0.2082941 0.2082941
 
 $bootStrapSamples
 $bootStrapSamples[[1]]
           a         b
-a 0.5555556 0.4444444
-b 0.5714286 0.4285714
+a 0.1428571 0.8571429
+b 0.5555556 0.4444444
 
 $bootStrapSamples[[2]]
-      a     b
-a 0.375 0.625
-b 0.625 0.375
-
-$bootStrapSamples[[3]]
     a   b
 a 0.3 0.7
 b 1.0 0.0
 
+$bootStrapSamples[[3]]
+          a         b
+a 0.7692308 0.2307692
+b 0.6666667 0.3333333
+
 $bootStrapSamples[[4]]
           a         b
-a 0.5555556 0.4444444
+a 0.4444444 0.5555556
 b 0.7142857 0.2857143
 
 $bootStrapSamples[[5]]
-      a     b
-a 0.375 0.625
-b 0.750 0.250
+     a    b
+a 0.25 0.75
+b 0.75 0.25
 
 $bootStrapSamples[[6]]
           a         b
-a 0.5555556 0.4444444
-b 0.5714286 0.4285714
+a 0.6363636 0.3636364
+b 1.0000000 0.0000000
 
 $bootStrapSamples[[7]]
-     a    b
-a 0.75 0.25
-b 1.00 0.00
+    a   b
+a 0.7 0.3
+b 0.5 0.5
 
 $bootStrapSamples[[8]]
           a         b
@@ -375,82 +375,85 @@ b 1.0000000 0.0000000
 
 $bootStrapSamples[[9]]
           a         b
-a 0.8181818 0.1818182
-b 0.6000000 0.4000000
+a 0.6666667 0.3333333
+b 1.0000000 0.0000000
 
 $bootStrapSamples[[10]]
           a         b
-a 0.5833333 0.4166667
-b 1.0000000 0.0000000
+a 0.2857143 0.7142857
+b 0.5555556 0.4444444
 
 
 
 > markovchainFit_cpp(sequence, "bootstrap")
+          a         b
+a 0.5267316 0.4732684
+b 0.6317857 0.3682143
 $estimate
 BootStrap Estimate 
  A  2 - dimensional discrete Markov Chain with following states 
  a b 
  The transition matrix   (by rows)  is defined as follows 
-          [,1]      [,2]
-[1,] 0.5763578 0.4236422
-[2,] 0.6125000 0.3875000
+          a         b
+a 0.5267316 0.4732684
+b 0.6317857 0.3682143
 
 
 $standardError
-          [,1]      [,2]
-[1,] 0.1723157 0.1723157
-[2,] 0.1626009 0.1626009
+          a         b
+a 0.1712239 0.1712239
+b 0.1450665 0.1450665
 
 $bootStrapSamples
 $bootStrapSamples[[1]]
           a         b
-a 0.8461538 0.1538462
-b 0.6666667 0.3333333
+a 0.4285714 0.5714286
+b 0.5555556 0.4444444
 
 $bootStrapSamples[[2]]
-          a         b
-a 0.4000000 0.6000000
-b 0.8333333 0.1666667
+     a    b
+a 0.75 0.25
+b 0.75 0.25
 
 $bootStrapSamples[[3]]
-    a   b
-a 0.5 0.5
-b 0.4 0.6
-
-$bootStrapSamples[[4]]
           a         b
 a 0.6363636 0.3636364
 b 0.8000000 0.2000000
 
+$bootStrapSamples[[4]]
+          a         b
+a 0.5555556 0.4444444
+b 0.5714286 0.4285714
+
 $bootStrapSamples[[5]]
-    a   b
-a 0.7 0.3
-b 0.5 0.5
+          a         b
+a 0.6666667 0.3333333
+b 0.4285714 0.5714286
 
 $bootStrapSamples[[6]]
           a         b
-a 0.3333333 0.6666667
-b 0.4000000 0.6000000
+a 0.2222222 0.7777778
+b 0.8571429 0.1428571
 
 $bootStrapSamples[[7]]
-          a         b
-a 0.5454545 0.4545455
-b 0.8000000 0.2000000
+      a     b
+a 0.500 0.500
+b 0.625 0.375
 
 $bootStrapSamples[[8]]
           a         b
-a 0.7272727 0.2727273
-b 0.6000000 0.4000000
+a 0.5555556 0.4444444
+b 0.7142857 0.2857143
 
 $bootStrapSamples[[9]]
-      a     b
-a 0.375 0.625
-b 0.625 0.375
+          a         b
+a 0.2857143 0.7142857
+b 0.4444444 0.5555556
 
 $bootStrapSamples[[10]]
-    a   b
-a 0.7 0.3
-b 0.5 0.5
+          a         b
+a 0.6666667 0.3333333
+b 0.5714286 0.4285714
 
 
 Warning message:
@@ -467,4 +470,4 @@ In fun(libname, pkgname) : no DISPLAY variable so Tk is not available
 > 
 > proc.time()
    user  system elapsed 
- 13.777   2.519  16.389 
+ 10.643   2.438  13.159 
