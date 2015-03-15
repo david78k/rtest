@@ -1,12 +1,13 @@
 #include <Rcpp.h>
 #include <omp.h>
 #include <unistd.h>
+//#include <random>
 //#include <Environment.h>
 //#include <RcppArmadillo.h>
 //// [[Rcpp::depends(RcppArmadillo)]]
 
 using namespace Rcpp;
-using namespace std;
+//using namespace std;
 
 template <typename T>
 T _transpose(T & m) {      // tranpose for IntegerMatrix / NumericMatrix, see array.c in R
@@ -151,7 +152,8 @@ NumericMatrix createSequenceMatrix_cpp(CharacterVector stringchar, bool toRowPro
 }
 
 // .mcFitMle<-function(stringchar,byrow)
-List _mcFitMle(CharacterVector stringchar, bool byrow) {
+List _mcFitMle(CharacterVector stringchar, bool byrow, double confidencelevel=95.0) {
+//List _mcFitMle(CharacterVector stringchar, bool byrow) {
 //NumericMatrix _mcFitMle(DataFrame stringchar, bool byrow) {
 /*
   initialMatr<-createSequenceMatrix(stringchar=stringchar,toRowProbs=TRUE)
@@ -159,22 +161,92 @@ List _mcFitMle(CharacterVector stringchar, bool byrow) {
   if(byrow==FALSE) outMc<-t(outMc)
   out<-list(estimate=outMc)
 */
-  //NumericMatrix out = createSequenceMatrix_cpp(stringchar, true);
-  NumericMatrix initialMatr = createSequenceMatrix_cpp(stringchar, true);
-//  Rf_PrintValue(initialMatr);
+
+  // get initialMatr and freqMatr at the same time for speedup
+//  NumericMatrix initialMatr = createSequenceMatrix_cpp(stringchar, true);
+  CharacterVector elements = unique(stringchar).sort();
+  int sizeMatr = elements.size();
+  //Rf_PrintValue(elements);
   
-  //if(byrow==false) outMc = transpose(outMc);
+  NumericMatrix initialMatr(sizeMatr);
+  NumericMatrix freqMatr(sizeMatr);
+  initialMatr.attr("dimnames") = List::create(elements, elements); 
+  //CharacterVector rnames = rownames(initialMatr);
+//  Rf_PrintValue(freqMatrix);
+  int posFrom, posTo;
+  for(int i = 0; i < stringchar.size() - 1; i ++) {
+	for (int j = 0; j < elements.size(); j ++) {
+		if(stringchar[i] == elements[j]) posFrom = j;
+		if(stringchar[i + 1] == elements[j]) posTo = j;
+	}
+  	freqMatr(posFrom,posTo)++;
+  }
+  //initialMatr = freqMatr;
+  //Rf_PrintValue(freqMatr);
+ 
+  // sanitize and to row probs
+  for (int i = 0; i < sizeMatr; i++) {
+  	double rowSum = 0;
+  	for (int j = 0; j < sizeMatr; j++) 
+  		rowSum += freqMatr(i, j);
+  	// toRowProbs
+    	for (int j = 0; j < sizeMatr; j++) {
+		if(rowSum == 0)
+      			initialMatr(i, j) = 1/sizeMatr;
+		else
+      			initialMatr(i, j) = freqMatr(i, j)/rowSum;
+	}
+  }
+  //Rf_PrintValue(initialMatr);
+
   if(byrow==false) initialMatr = _transpose(initialMatr);
+
+  // confidence interval
+  double criticalValue = 1 - (1 - confidencelevel)/2;
+  //double score = 1.644853;
+  double zscore = 1.96;
+  //double tscore = 2.12; // _tscore(criticalValue, n - 1);
+  //double tscore = 1.96;
+  if(confidencelevel == 99.9) zscore = 3.3;
+  else if(confidencelevel == 99.0) zscore = 2.577;
+  else if(confidencelevel == 98.5) zscore = 2.43;
+  else if(confidencelevel == 97.5) zscore = 2.243;
+  else if(confidencelevel == 90.0) zscore = 1.645;
+  else if(confidencelevel == 85.0) zscore = 1.439;
+  else if(confidencelevel == 75.0) zscore = 1.151;
+
+  int n = stringchar.size();
+  //Rcout << "transition count: " << n << endl;
+  //double lowerEndpoint = cellMean - criticalValue*sigma/sqrt(n);
+  //double upperEndpoint = cellMean + criticalValue*sigma/sqrt(n);
+  NumericMatrix lowerEndpointMatr = NumericMatrix(initialMatr.nrow(), initialMatr.ncol());
+  NumericMatrix upperEndpointMatr = NumericMatrix(initialMatr.nrow(), initialMatr.ncol());
+
+  for(int i = 0; i < initialMatr.nrow(); i ++) {
+	for(int j = 0; j < initialMatr.ncol(); j ++) {
+		lowerEndpointMatr(i,j) = std::max(0.0, std::min(1.0, initialMatr(i, j) - zscore * initialMatr(i,j) / sqrt(freqMatr(i,j))));
+		upperEndpointMatr(i,j) = std::max(0.0, std::min(1.0, initialMatr(i, j) + zscore * initialMatr(i,j) / sqrt(freqMatr(i,j))));
+		//lowerEndpointMatr(i,j) = std::max(0.0, std::min(1.0, initialMatr(i, j) - score * initialMatr(i,j) / sqrt(n)));
+		//upperEndpointMatr(i,j) = std::max(0.0, std::min(1.0, initialMatr(i, j) + score * initialMatr(i,j) / sqrt(n)));
+		//lowerEndpoint = tscore(criticalValue, n - 1) * initialMatr(i,j) / sqrt(n);
+		//lowerEndpoint = initialMatr(i,j) - criticalValue * sigma / sqrt(n);		
+  	}
+  }
+  lowerEndpointMatr.attr("dimnames") = List::create(elements, elements); 
+  upperEndpointMatr.attr("dimnames") = List::create(elements, elements); 
+  //Rf_PrintValue(lowerEndpointMatr);
+  //Rf_PrintValue(upperEndpointMatr);
 
   //NumericMatrix outMc(initialMatr); //("markovchain", initialMatr,"MLE Fit");
   S4 outMc("markovchain");
   outMc.slot("transitionMatrix") = initialMatr;
   outMc.slot("name") = "MLE Fit";  
-
-  return List::create(_["estimate"] = outMc);
-  //List out(1);
-  //out[0] = outMc;
-  //return out;
+  //outMc.slot("lowerEndpointMatrix") = lowerEndpointMatr;
+  //outMc.slot("upperEndpointMatrix") = upperEndpointMatr;
+  
+  return List::create(_["estimate"] = outMc
+		, _["confidenceInterval"] = List::create(lowerEndpointMatr, upperEndpointMatr)
+	);
 }
 
 // .mcFitLaplacianSmooth<-function(stringchar,byrow,laplacian=0.01)
@@ -238,9 +310,9 @@ List _bootstrapCharacterSequences(CharacterVector stringchar, int n, int size=-1
 */
   if(size == -1) size = stringchar.size();
   NumericMatrix contingencyMatrix = createSequenceMatrix_cpp(stringchar);
-//  Rf_PrintValue(contingencyMatrix);
+  Rf_PrintValue(contingencyMatrix);
 
-  List samples;
+  List samples, res;
   CharacterVector itemset = rownames(contingencyMatrix);
   int itemsetsize = itemset.size();
   //Rf_PrintValue(itemset);
@@ -253,26 +325,26 @@ List _bootstrapCharacterSequences(CharacterVector stringchar, int n, int size=-1
  	String ch = itemset[rnd];
 	//Rcout << rnd << " " << itemset[rnd] << endl;
 	//Rf_PrintValue(ch);
-	List res = sample(itemset, 1);
-	CharacterVector cv = res[0];
-	ch = cv[0];
-	charseq.push_back(cv[0]);
-	//charseq.push_back(ch);
+//	res = sample(itemset, 1);
+//	CharacterVector cv = res[0];
+//	ch = cv[0];
+//	charseq.push_back(cv[0]);
+	charseq.push_back(ch);
 	//Rf_PrintValue(charseq);
 	for(int j = 1; j < size; j ++) {
 		NumericVector probsVector;
 		for(int k = 0; k < itemsetsize; k ++) 
-			if((string)itemset[k] == (string) ch) {
+			if((std::string)itemset[k] == (std::string) ch) {
 				probsVector = contingencyMatrix(k, _);	
-				//Rcout << k << " " << (string)ch << endl;
+				Rcout << k << " " << (std::string)ch << std::endl;
 				//Rf_PrintValue(probsVector);
 				break;
 			}
+		//Rf_PrintValue(probsVector);
   		//srand(time(NULL));
-		rnd = rand()%itemsetsize;
- 		ch = itemset[rnd];
+		//rnd = rand()%itemsetsize;
+ 		//ch = itemset[rnd];
 		res = sample(itemset, 1, true, probsVector);
-		//SEXP character = sample(itemset, 1, true, probsVector);
 		//Rcout << res[0] << endl;
 		//Rcout << "res[0]" << endl;
 		//Rf_PrintValue(res[0]);
@@ -318,6 +390,7 @@ List _fromBoot2Estimate(List listMatr) {
     return(out)
 */
   int sampleSize = listMatr.size();
+  //Rcout << "sampleSize: " << sampleSize << endl;
   NumericMatrix firstMat = listMatr[0];
   int matrDim = firstMat.nrow();
   //Rcout << matrDim << endl;
@@ -331,6 +404,8 @@ List _fromBoot2Estimate(List listMatr) {
 			NumericMatrix mat = listMatr[k];
 			probsEstimated.push_back(mat(i,j));
 		}
+//		Rcout << "probEstimated" << endl;
+//		Rf_PrintValue(probsEstimated);
 		matrMean(i,j) = mean(probsEstimated);
 		matrSd(i,j) = sd(probsEstimated);
   	}
@@ -378,6 +453,7 @@ List _mcFitBootStrap(CharacterVector data, int nboot=10, bool byrow=true, bool p
   return(out)
 */
   List theList = _bootstrapCharacterSequences(data, nboot);
+  //List theList = bootstrapCharacterSequences(data, nboot);
   int n = theList.size();
   //Rcout << "theList.size() " << n << endl;
   List pmsBootStrapped(n);
@@ -410,7 +486,7 @@ List _mcFitBootStrap(CharacterVector data, int nboot=10, bool byrow=true, bool p
   //estimateList<-.fromBoot2Estimate(listMatr=pmsBootStrapped)
   List estimateList = _fromBoot2Estimate(pmsBootStrapped);
   NumericMatrix transMatr = _toRowProbs(estimateList["estMu"]);
-  Rf_PrintValue(transMatr);
+  //Rf_PrintValue(transMatr);
   //int size = temp.nrow();
   
   //NumericMatrix temp = estimateList["estMu"];
@@ -473,10 +549,10 @@ S4 _matr2Mc(CharacterMatrix matrData, double laplacian=0) {
   int nRows = matrData.nrow(), nCols = matrData.ncol();
   //Rf_PrintValue(matrData);
   //Rcout << nRows << endl;
-  set<string> uniqueVals;
+  std::set<std::string> uniqueVals;
   for(int i = 0; i < nRows; i++) 
   	for(int j = 0; j < nCols; j++) 
-		uniqueVals.insert((string)matrData(i, j));	
+		uniqueVals.insert((std::string)matrData(i, j));	
   //Rcout << uniqueVals << endl;
   //Rf_PrintValue(uniqueVals);
 /*
@@ -488,14 +564,14 @@ S4 _matr2Mc(CharacterMatrix matrData, double laplacian=0) {
   NumericMatrix contingencyMatrix (usize, usize);
   contingencyMatrix.attr("dimnames") = List::create(uniqueVals, uniqueVals); 
   
-  set<string>::iterator it;
+  std::set<std::string>::iterator it;
   int stateBegin, stateEnd;
   for(int i = 0; i < nRows; i ++) {
 	for(int j = 1; j < nCols; j ++) {
 		int k = 0;
   		for(it=uniqueVals.begin(); it!=uniqueVals.end(); ++it, k++) {
-			if(*it == (string)matrData(i,j-1)) stateBegin = k;
-			if(*it == (string)matrData(i,j)) stateEnd = k;
+			if(*it == (std::string)matrData(i,j-1)) stateBegin = k;
+			if(*it == (std::string)matrData(i,j)) stateEnd = k;
 		}
     //Rcout << stringchar[i] << "->" << stringchar[i + 1] << ": " << posFrom << " " << posTo << endl;
     		contingencyMatrix(stateBegin,stateEnd)++;
@@ -532,7 +608,8 @@ S4 _matr2Mc(CharacterMatrix matrData, double laplacian=0) {
 
 // markovchainFit<-function(data,method="mle", byrow=TRUE,nboot=10,laplacian=0, name, parallel=FALSE)
 // [[Rcpp::export]]
-List markovchainFit_cpp(SEXP data, String method="mle", bool byrow=true, int nboot=10, double laplacian=0, String name="", bool parallel=false) {
+List markovchainFit_cpp(SEXP data, String method="mle", bool byrow=true, int nboot=10, double laplacian=0, String name="", bool parallel=false, double confidencelevel=0.95) {
+//List markovchainFit_cpp(SEXP data, String method="mle", bool byrow=true, int nboot=10, double laplacian=0, String name="", bool parallel=false) {
 //List markovchainFit_cpp(SEXP data, String method="mle", bool byrow=true, int nboot=10, double laplacian=0, String name="", bool parallel=true) {
   List out;
  // Rf_PrintValue(data);
@@ -603,8 +680,9 @@ sequence <- c("a", "b", "a", "a", "a", "a", "b", "a", "b", "a", "b", "a", "a", "
 #microbenchmark(
   #markovchainFit(data = sequence)#,
   #markovchainFit(data = sequence, method="laplace", laplacian=0.1)#,
-  markovchainFit(data = sequence, method="bootstrap")#,
+  mcfit(data = sequence, method="bootstrap")#,
   #markovchainFit(data = sequence, byrow=FALSE)#,
+
   #markovchainFit_cpp(sequence)
   markovchainFit_cpp(sequence, "bootstrap")
   #markovchainFit_cpp(sequence, "laplace", laplacian=0.1)

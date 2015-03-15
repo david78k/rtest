@@ -97,11 +97,13 @@ createSequenceMatrix<-function(stringchar, toRowProbs=FALSE,sanitize=TRUE)
     charseq<-character()
     char<-sample(x=itemset,size=1)
     charseq<-c(charseq,char)
+    print(charseq)
     for(j in 2:size) #cicle to define the element in a list
     {
       probsVector<-contingencyMatrix[which(rownames(contingencyMatrix)==char),]
       char<-sample(x=itemset,size=1, replace=TRUE,prob=probsVector)
       charseq<-c(charseq,char)
+      print(probsVector)
     }
     samples[[length(samples)+1]]<-charseq #increase the list
   }
@@ -268,6 +270,7 @@ library(Rcpp)
 sourceCpp("mcfit.cpp")
 
 #sequence <- c("a", "b", "a", "a", "a", "a", "b", "a", "b", "a", "b", "a", "a", "b", "b", "b", "a")
+#mcfit(sequence, method="bootstrap")
 #markovchainFit_cpp(sequence)
 #mcfit(data = sequence)
 # $estimate
