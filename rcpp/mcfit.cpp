@@ -48,16 +48,9 @@ NumericMatrix createSequenceMatrix_cpp(CharacterVector stringchar, bool toRowPro
 		if(stringchar[i] == rnames[j]) posFrom = j;
 		if(stringchar[i + 1] == rnames[j]) posTo = j;
 	}
-    //int posFrom = find(rnames.begin(), rnames.end(), stringchar[i]) - rnames.begin();
-    //int posTo = find(rnames.begin(), rnames.end(), stringchar[i + 1]) - rnames.begin();
-    //Rcout << stringchar[i] << "->" << stringchar[i + 1] << ": " << posFrom << " " << posTo << endl;
   	freqMatrix(posFrom,posTo)++;
-    //freqMatrix[posFrom][posTo]=freqMatrix[posFrom][posTo]+1;
-    //Rf_PrintValue(freqMatrix);
   }
  
-  //Rf_PrintValue(freqMatrix);
-
   //sanitizing if any row in the matrix sums to zero by posing the corresponding diagonal equal to 1/dim
   if(sanitize==true)
   {
@@ -71,44 +64,20 @@ NumericMatrix createSequenceMatrix_cpp(CharacterVector stringchar, bool toRowPro
 	}
   }
   if(toRowProbs==true)
-  {
-    //freqMatrix<-freqMatrix/rowSums(freqMatrix)
 	freqMatrix = _toRowProbs(freqMatrix);
-/*	for (int i = 0; i < sizeMatr; i++) {
-    		double rowSum = 0;
-    		for (int j = 0; j < sizeMatr; j++) 
-      			rowSum += freqMatrix(i, j);
-    		for (int j = 0; j < sizeMatr; j++) 
-      			freqMatrix(i, j) /= rowSum;
-	}
-*/
-  }
 
   return (freqMatrix);
 }
 
-// .mcFitMle<-function(stringchar,byrow)
 List _mcFitMle(CharacterVector stringchar, bool byrow, double confidencelevel=95.0) {
-//List _mcFitMle(CharacterVector stringchar, bool byrow) {
-//NumericMatrix _mcFitMle(DataFrame stringchar, bool byrow) {
-/*
-  initialMatr<-createSequenceMatrix(stringchar=stringchar,toRowProbs=TRUE)
-  outMc<-new("markovchain", transitionMatrix=initialMatr,name="MLE Fit")
-  if(byrow==FALSE) outMc<-t(outMc)
-  out<-list(estimate=outMc)
-*/
-
   // get initialMatr and freqMatr at the same time for speedup
-//  NumericMatrix initialMatr = createSequenceMatrix_cpp(stringchar, true);
   CharacterVector elements = unique(stringchar).sort();
   int sizeMatr = elements.size();
-  //Rf_PrintValue(elements);
   
   NumericMatrix initialMatr(sizeMatr);
   NumericMatrix freqMatr(sizeMatr);
   initialMatr.attr("dimnames") = List::create(elements, elements); 
-  //CharacterVector rnames = rownames(initialMatr);
-//  Rf_PrintValue(freqMatrix);
+
   int posFrom, posTo;
   for(int i = 0; i < stringchar.size() - 1; i ++) {
 	for (int j = 0; j < elements.size(); j ++) {
@@ -117,8 +86,6 @@ List _mcFitMle(CharacterVector stringchar, bool byrow, double confidencelevel=95
 	}
   	freqMatr(posFrom,posTo)++;
   }
-  //initialMatr = freqMatr;
-  //Rf_PrintValue(freqMatr);
  
   // sanitize and to row probs
   for (int i = 0; i < sizeMatr; i++) {
@@ -133,16 +100,11 @@ List _mcFitMle(CharacterVector stringchar, bool byrow, double confidencelevel=95
       			initialMatr(i, j) = freqMatr(i, j)/rowSum;
 	}
   }
-  //Rf_PrintValue(initialMatr);
 
   if(byrow==false) initialMatr = _transpose(initialMatr);
 
   // confidence interval
-  double criticalValue = 1 - (1 - confidencelevel)/2;
-  //double score = 1.644853;
   double zscore = 1.96;
-  //double tscore = 2.12; // _tscore(criticalValue, n - 1);
-  //double tscore = 1.96;
   if(confidencelevel == 99.9) zscore = 3.3;
   else if(confidencelevel == 99.0) zscore = 2.577;
   else if(confidencelevel == 98.5) zscore = 2.43;
@@ -152,9 +114,6 @@ List _mcFitMle(CharacterVector stringchar, bool byrow, double confidencelevel=95
   else if(confidencelevel == 75.0) zscore = 1.151;
 
   int n = stringchar.size();
-  //Rcout << "transition count: " << n << endl;
-  //double lowerEndpoint = cellMean - criticalValue*sigma/sqrt(n);
-  //double upperEndpoint = cellMean + criticalValue*sigma/sqrt(n);
   NumericMatrix lowerEndpointMatr = NumericMatrix(initialMatr.nrow(), initialMatr.ncol());
   NumericMatrix upperEndpointMatr = NumericMatrix(initialMatr.nrow(), initialMatr.ncol());
 
@@ -162,23 +121,14 @@ List _mcFitMle(CharacterVector stringchar, bool byrow, double confidencelevel=95
 	for(int j = 0; j < initialMatr.ncol(); j ++) {
 		lowerEndpointMatr(i,j) = std::max(0.0, std::min(1.0, initialMatr(i, j) - zscore * initialMatr(i,j) / sqrt(freqMatr(i,j))));
 		upperEndpointMatr(i,j) = std::max(0.0, std::min(1.0, initialMatr(i, j) + zscore * initialMatr(i,j) / sqrt(freqMatr(i,j))));
-		//lowerEndpointMatr(i,j) = std::max(0.0, std::min(1.0, initialMatr(i, j) - score * initialMatr(i,j) / sqrt(n)));
-		//upperEndpointMatr(i,j) = std::max(0.0, std::min(1.0, initialMatr(i, j) + score * initialMatr(i,j) / sqrt(n)));
-		//lowerEndpoint = tscore(criticalValue, n - 1) * initialMatr(i,j) / sqrt(n);
-		//lowerEndpoint = initialMatr(i,j) - criticalValue * sigma / sqrt(n);		
   	}
   }
   lowerEndpointMatr.attr("dimnames") = List::create(elements, elements); 
   upperEndpointMatr.attr("dimnames") = List::create(elements, elements); 
-  //Rf_PrintValue(lowerEndpointMatr);
-  //Rf_PrintValue(upperEndpointMatr);
 
-  //NumericMatrix outMc(initialMatr); //("markovchain", initialMatr,"MLE Fit");
   S4 outMc("markovchain");
   outMc.slot("transitionMatrix") = initialMatr;
   outMc.slot("name") = "MLE Fit";  
-  //outMc.slot("lowerEndpointMatrix") = lowerEndpointMatr;
-  //outMc.slot("upperEndpointMatrix") = upperEndpointMatr;
   
   return List::create(_["estimate"] = outMc
 		, _["confidenceInterval"] = List::create(lowerEndpointMatr, upperEndpointMatr)

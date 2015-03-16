@@ -369,4 +369,4 @@ In fun(libname, pkgname) : no DISPLAY variable so Tk is not available
 > 
 > proc.time()
    user  system elapsed 
- 12.150   2.709  14.935 
+  9.760   1.959  11.757 
