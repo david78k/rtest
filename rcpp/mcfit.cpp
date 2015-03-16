@@ -135,20 +135,7 @@ List _mcFitMle(CharacterVector stringchar, bool byrow, double confidencelevel=95
 	);
 }
 
-// .mcFitLaplacianSmooth<-function(stringchar,byrow,laplacian=0.01)
 List _mcFitLaplacianSmooth(CharacterVector stringchar, bool byrow, double laplacian=0.01) {
-/*
-  origNum<-createSequenceMatrix(stringchar=stringchar,toRowProbs=FALSE)
-	sumOfRow<-rowSums(origNum)
-	origDen<-matrix(rep(sumOfRow,length(sumOfRow)),byrow = FALSE,ncol=length(sumOfRow))
-	newNum<-origNum+laplacian
-	newSumOfRow<-rowSums(newNum)
-	newDen<-matrix(rep(newSumOfRow,length(newSumOfRow)),byrow = FALSE,ncol=length(newSumOfRow))
-	transMatr<-newNum/newDen
-	outMc<-new("markovchain", transitionMatrix=transMatr,name="Laplacian Smooth Fit")
-	if(byrow==FALSE) outMc<-t(outMc)
-	out<-list(estimate=outMc)
-*/
   NumericMatrix origNum = createSequenceMatrix_cpp(stringchar, false);
   int nRows = origNum.nrow(), nCols = origNum.ncol();
   for(int i = 0; i < nRows; i ++) {
@@ -157,13 +144,12 @@ List _mcFitLaplacianSmooth(CharacterVector stringchar, bool byrow, double laplac
     		origNum(i,j) += laplacian;
     		rowSum += origNum(i,j);
   	}
-  	//#get a transition matrix and a DTMC
+  	//get a transition matrix and a DTMC
 	for(int j = 0; j < nCols; j ++) 
     		origNum(i,j) /= rowSum;
   }
   
   if(byrow==false) origNum = _transpose(origNum);
-//  Rf_PrintValue(origNum);
  
   S4 outMc("markovchain");
   outMc.slot("transitionMatrix") = origNum;
@@ -172,115 +158,44 @@ List _mcFitLaplacianSmooth(CharacterVector stringchar, bool byrow, double laplac
   return List::create(_["estimate"] = outMc);
 }
 
-// .bootstrapCharacterSequences<-function(stringchar, n, size=length(stringchar))
-//List _bootstrapCharacterSequences(CharacterVector stringchar, int n, int size=stringchar.size()) {
 List _bootstrapCharacterSequences(CharacterVector stringchar, int n, int size=-1) {
-/*
-  contingencyMatrix<-createSequenceMatrix(stringchar=stringchar)
-  samples<-list()
-  itemset<-rownames(contingencyMatrix)
-  for(i in 1:n) #cicle to fill the samples
-  {
-    charseq<-character()
-    char<-sample(x=itemset,size=1)
-    charseq<-c(charseq,char)
-    for(j in 2:size) #cicle to define the element in a list
-    {
-      probsVector<-contingencyMatrix[which(rownames(contingencyMatrix)==char),]
-      char<-sample(x=itemset,size=1, replace=TRUE,prob=probsVector)
-      charseq<-c(charseq,char)
-    }
-    samples[[length(samples)+1]]<-charseq #increase the list
-  }
-  return(samples)
-*/
   if(size == -1) size = stringchar.size();
   NumericMatrix contingencyMatrix = createSequenceMatrix_cpp(stringchar);
-  //Rf_PrintValue(contingencyMatrix);
 
   List samples, res;
   CharacterVector itemset = rownames(contingencyMatrix);
   int itemsetsize = itemset.size();
-  //Rf_PrintValue(itemset);
 
   Function sample("sample");
   srand(time(NULL));
   for(int i = 0; i < n; i ++) {
-	CharacterVector charseq;	
+	CharacterVector charseq, resvec;	
 	int rnd = rand()%itemsetsize;
  	String ch = itemset[rnd];
- 	//Rcout << std::string(ch) << std::endl;
-	//Rcout << rnd << " " << itemset[rnd] << endl;
-	//Rf_PrintValue(ch);
-//	res = sample(itemset, 1);
-//	CharacterVector cv = res[0];
-//	ch = cv[0];
-//	charseq.push_back(cv[0]);
 	charseq.push_back(ch);
-	//Rf_PrintValue(charseq);
 	for(int j = 1; j < size; j ++) {
 		NumericVector probsVector;
 		for(int k = 0; k < itemsetsize; k ++) {
 			if((std::string)itemset[k] == (std::string) ch) {
 				probsVector = contingencyMatrix(k, _);	
-				//Rcout << k << " " << (std::string)ch << std::endl;
-				//Rf_PrintValue(probsVector);
 				break;
 			}
 		}
-		//Rf_PrintValue(probsVector);
-  		//srand(time(NULL));
-		//rnd = rand()%itemsetsize;
- 		//ch = itemset[rnd];
 		res = sample(itemset, 1, true, probsVector);
-		//Rcout << "sampled: "; 
-	//	Rf_PrintValue(res[0]);
-		CharacterVector v = res[0];
-		//Rf_PrintValue(res[0]);
-		//Rf_PrintValue(character);
-		ch = v[0];
+		resvec = res[0];
+		ch = resvec[0];
 		charseq.push_back(ch);
  	}
-	//samples[[samples.size() + 1]] = charseq;
 	samples.push_back(charseq);
-	//samples = List::create(clone(samples), charseq);
   }
-
-  //Rf_PrintValue(samples);
 
   return samples;
 }
 
-// .fromBoot2Estimate<-function(listMatr)
 List _fromBoot2Estimate(List listMatr) {
-/*
-  sampleSize<-length(listMatr)
-  matrDim<-nrow(listMatr[[1]])
-  #create the estimate output
-  matrMean<-zeros(matrDim)
-  matrSd<-zeros(matrDim)
-  #create the sample output
-  for(i in 1:matrDim) #move by row
-  {
-    for(j in 1:matrDim) #move by cols
-    {
-      probsEstimated<-numeric()
-      #fill the probs
-      for(k in 1:sampleSize) probsEstimated<-c(probsEstimated,listMatr[[k]][i,j])
-      muCell<-mean(probsEstimated)
-      sdCell<-sd(probsEstimated)
-      matrMean[i,j]<-muCell
-      matrSd[i,j]<-sdCell
-    }
-  }
-	out<-list(estMu=matrMean, estSigma=matrSd)
-    return(out)
-*/
   int sampleSize = listMatr.size();
-  //Rcout << "sampleSize: " << sampleSize << endl;
   NumericMatrix firstMat = listMatr[0];
   int matrDim = firstMat.nrow();
-  //Rcout << matrDim << endl;
   NumericMatrix matrMean(matrDim);
   NumericMatrix matrSd(matrDim);
 
@@ -291,8 +206,6 @@ List _fromBoot2Estimate(List listMatr) {
 			NumericMatrix mat = listMatr[k];
 			probsEstimated.push_back(mat(i,j));
 		}
-//		Rcout << "probEstimated" << endl;
-//		Rf_PrintValue(probsEstimated);
 		matrMean(i,j) = mean(probsEstimated);
 		matrSd(i,j) = sd(probsEstimated);
   	}
@@ -302,101 +215,28 @@ List _fromBoot2Estimate(List listMatr) {
   return List::create(_["estMu"]=matrMean, _["estSigma"]=matrSd);
 }
 
-List lapply(List input, Function f) {
-  int n = input.size();
-  List out(n);
-
-  for(int i = 0; i < n; i++) {
-    out[i] = f(input[i]);
-  }
-
-  return out;
-}
-
-// .mcFitBootStrap<-function(data, nboot=10,byrow=TRUE, parallel=FALSE)
 List _mcFitBootStrap(CharacterVector data, int nboot=10, bool byrow=true, bool parallel=false) {
-/*
-  #create the list of bootstrap sequence sample
-	theList<-.bootstrapCharacterSequences(stringchar=data, n=nboot)
-	if(!parallel)
-		#convert the list in a probability matrix
-		pmsBootStrapped<-lapply(X=theList, FUN=createSequenceMatrix, toRowProbs=TRUE,sanitize=TRUE)
-	 else {
-		#require(parallel)
-		type <- if(exists("mcfork", mode = "function")) "FORK" else "PSOCK"
-		cores <- getOption("mc.cores", detectCores())
-		cl <- makeCluster(cores, type = type)
-		clusterExport(cl, varlist = c("createSequenceMatrix","zeros"))
-		pmsBootStrapped<-parLapply(cl=cl, X=theList, fun="createSequenceMatrix", toRowProbs=TRUE,sanitize=TRUE)
-		stopCluster(cl)
-	 }
- 
-  estimateList<-.fromBoot2Estimate(listMatr=pmsBootStrapped)
-  #from raw to estimate
-  temp<-estimateList$estMu
-  transMatr<-sweep(temp, 1, rowSums(temp), FUN="/")
-  estimate<-new("markovchain",transitionMatrix=transMatr, byrow=byrow, name="BootStrap Estimate")
-  out<-list(estimate=estimate, standardError=estimateList$estSigma,bootStrapSamples=pmsBootStrapped)
-  return(out)
-*/
   List theList = _bootstrapCharacterSequences(data, nboot);
-  //List theList = bootstrapCharacterSequences(data, nboot);
   int n = theList.size();
-  //Rcout << "theList.size() " << n << endl;
   List pmsBootStrapped(n);
-  //List pmsBootStrapped(theList.size());
 
-  //if(!parallel) pmsBootStrapped = theList;
-  if(!parallel) { //pmsBootStrapped = lapply(theList, createSequenceMatrix_cpp, true, true);
-	for(int i = 0; i < n; i++) { 
+  if(!parallel) { 
+	for(int i = 0; i < n; i++) 
 		pmsBootStrapped[i] = createSequenceMatrix_cpp(theList[i], true, true);
-//		Rf_PrintValue(pmsBootStrapped[i]);
-	}
   } else {
-	//String type;
-//	if(Rf_findFun("mcfork", R_GlobalEnv)) 
-	//if(exists("mcfork"))
-	//SEXP nameSym = Rf_install("mcfork");
-	//SEXP res = Rf_findVarInFrame( String::get__() , nameSym  ) ;
-	//if(res != R_UnboundValue)
-		//type = "FORK"; else "PSOCK";			
 	int cores = sysconf(_SC_NPROCESSORS_ONLN);
-//	Rcout << "cores: " << cores << endl;
-	//omp_set_dynamic(0);
 	omp_set_num_threads(cores);
 	#pragma omp parallel for
-	for(int i = 0; i < n; i ++) {
+	for(int i = 0; i < n; i ++) 
 		pmsBootStrapped[i] = createSequenceMatrix_cpp(theList[i], true, true);
-		//Rf_PrintValue(pmsBootStrapped[i]);
-	}
   }
-  //estimateList<-.fromBoot2Estimate(listMatr=pmsBootStrapped)
   List estimateList = _fromBoot2Estimate(pmsBootStrapped);
   NumericMatrix transMatr = _toRowProbs(estimateList["estMu"]);
-  //Rf_PrintValue(transMatr);
-  //int size = temp.nrow();
-  
-  //NumericMatrix temp = estimateList["estMu"];
-  //Function sweep("sweep");
-  //NumericMatrix transMatr2 = sweep(temp, 1, _rowSumsC(temp), "/");
-  //Rf_PrintValue(transMatr2);
-  
-/*
-  for(int i = 0; i < size; i ++) {
-	double rowSum = 0;
-  	for(int j = 0; j < size; j ++) 
-		rowSum += temp(i, j);
-  	for(int j = 0; j < size; j ++) 
-		temp(i, j) /= rowSum;
-  }
-  transMatr = temp;
-*/
+
   S4 estimate("markovchain");
   estimate.slot("transitionMatrix") = transMatr;
   estimate.slot("byrow") = byrow;
   estimate.slot("name") = "BootStrap Estimate";  
-
-  //Rcout << "bootStrapSamples.size() " << pmsBootStrapped.size() << endl;
 
   return List::create(_["estimate"] = estimate
 		, _["standardError"] = estimateList["estSigma"]
@@ -404,51 +244,16 @@ List _mcFitBootStrap(CharacterVector data, int nboot=10, bool byrow=true, bool p
 		);
 }
 
-// .matr2Mc<-function(matrData,laplacian=0) 
 S4 _matr2Mc(CharacterMatrix matrData, double laplacian=0) {
-//NumericMatrix _matr2Mc(SEXP matrData, double laplacian=0) {
-/*
-  #find unique values scanning the matrix
-  nCols<-ncol(matrData)
-  uniqueVals<-character()
-  for(i in 1:nCols) uniqueVals<-union(uniqueVals,unique(as.character(matrData[,i])))
-  uniqueVals<-sort(uniqueVals)
-  #create a contingency matrix
-  contingencyMatrix<-matrix(rep(0,length(uniqueVals)^2),ncol=length(uniqueVals))
-  rownames(contingencyMatrix)<-colnames(contingencyMatrix)<-uniqueVals
-  #fill the contingency matrix
-  for(i in 1:nrow(matrData))
-  {
-    for( j in 2:nCols)
-    {
-      stateBegin<-as.character(matrData[i,j-1]);whichRow<-which(uniqueVals==stateBegin)
-      stateEnd<-as.character(matrData[i,j]);whichCols<-which(uniqueVals==stateEnd)
-      contingencyMatrix[whichRow,whichCols]<-contingencyMatrix[whichRow,whichCols]+1
-    }
-  }
-  #add laplacian correction if needed
-  contingencyMatrix<-contingencyMatrix+laplacian
-  #get a transition matrix and a DTMC
-  transitionMatrix<-contingencyMatrix/rowSums(contingencyMatrix)
-  outMc<-new("markovchain",transitionMatrix=transitionMatrix)
-*/
-  //CharacterMatrix mat(matrData);
   int nRows = matrData.nrow(), nCols = matrData.ncol();
-  //Rf_PrintValue(matrData);
-  //Rcout << nRows << endl;
+
   std::set<std::string> uniqueVals;
   for(int i = 0; i < nRows; i++) 
   	for(int j = 0; j < nCols; j++) 
 		uniqueVals.insert((std::string)matrData(i, j));	
-  //Rcout << uniqueVals << endl;
-  //Rf_PrintValue(uniqueVals);
-/*
-  for(set<string>::iterator it=uniqueVals.begin(); it!=uniqueVals.end(); ++it)
-	Rcout << ' ' << *it;
-  Rcout << endl;
-*/
+
   int usize = uniqueVals.size();
-  NumericMatrix contingencyMatrix (usize, usize);
+  NumericMatrix contingencyMatrix (usize);
   contingencyMatrix.attr("dimnames") = List::create(uniqueVals, uniqueVals); 
   
   std::set<std::string>::iterator it;
@@ -460,7 +265,6 @@ S4 _matr2Mc(CharacterMatrix matrData, double laplacian=0) {
 			if(*it == (std::string)matrData(i,j-1)) stateBegin = k;
 			if(*it == (std::string)matrData(i,j)) stateEnd = k;
 		}
-    //Rcout << stringchar[i] << "->" << stringchar[i + 1] << ": " << posFrom << " " << posTo << endl;
     		contingencyMatrix(stateBegin,stateEnd)++;
 	}
   }
@@ -474,12 +278,8 @@ S4 _matr2Mc(CharacterMatrix matrData, double laplacian=0) {
   	}
   	//get a transition matrix and a DTMC
 	for(int j = 0; j < usize; j ++) 
-    		//transitionMatrix(i,j) = contingencyMatrix(i,j)/rowSum;
     		contingencyMatrix(i,j) /= rowSum;
   }
-  //#get a transition matrix and a DTMC
-  //transitionMatrix<-contingencyMatrix/rowSums(contingencyMatrix);
-  //outMc<-new("markovchain",transitionMatrix=transitionMatrix);
   
   S4 outMc("markovchain");
   outMc.slot("transitionMatrix") = contingencyMatrix;
@@ -490,7 +290,6 @@ S4 _matr2Mc(CharacterMatrix matrData, double laplacian=0) {
 // [[Rcpp::export]]
 List markovchainFit_cpp(SEXP data, String method="mle", bool byrow=true, int nboot=10, double laplacian=0, String name="", bool parallel=false, double confidencelevel=0.95) {
   List out;
-  //if(class(data) %in% c("data.frame","matrix")) {
   if(Rf_inherits(data, "data.frame") || Rf_inherits(data, "matrix")) { 
 	CharacterMatrix mat;
     	//if data is a data.frame forced to matrix
@@ -525,19 +324,19 @@ List markovchainFit_cpp(SEXP data, String method="mle", bool byrow=true, int nbo
 /*** R 
 library(microbenchmark)
 sequence <- c("a", "b", "a", "a", "a", "a", "b", "a", "b", "a", "b", "a", "a", "b", "b", "b", "a")
-#sequence <- data.frame(t(sequence))
-#microbenchmark(
-  markovchainFit(data = sequence)
+sequence <- data.frame(t(sequence))
+microbenchmark(
+  #markovchainFit(data = sequence),
   #markovchainFit(data = sequence, method="laplace", laplacian=0.1),
-  #markovchainFit(data = sequence, method="bootstrap")#,
+  markovchainFit(data = sequence, method="bootstrap"),
   #mcfit(data = sequence, method="bootstrap"),
   #markovchainFit(data = sequence, byrow=FALSE)#,
 
-  markovchainFit_cpp(sequence)
-  #markovchainFit_cpp(sequence, "bootstrap")
+  #markovchainFit_cpp(sequence)
   #markovchainFit_cpp(sequence, "laplace", laplacian=0.1)
+  markovchainFit_cpp(sequence, "bootstrap")
   #markovchainFit_cpp(sequence, byrow=FALSE)
-#)
+)
 */
 /*  markovchainFit_cpp(sequence)
   #markovchainFit_cpp(sequence, byrow=FALSE)
