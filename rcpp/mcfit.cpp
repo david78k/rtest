@@ -3,20 +3,13 @@
 #include <unistd.h>
 
 using namespace Rcpp;
-//using namespace std;
 
 template <typename T>
-T _transpose(T & m) {      // tranpose for IntegerMatrix / NumericMatrix, see array.c in R
-//T transpose(const T & m) {      // tranpose for IntegerMatrix / NumericMatrix, see array.c in R
-//NumericMatrix transpose(NumericMatrix & m) {      // tranpose for IntegerMatrix / NumericMatrix, see array.c in R
+T _transpose(T & m) {      
   int k = m.rows(), n = m.cols();
-  //Rcpp::Rcout << "Transposing " << n << " by " << k << std::endl;
   T z(n, k);
-  //NumericMatrix z(n, k);
   z.attr("dimnames") = List::create(colnames(m), rownames(m)); 
-  //z.attr("dimnames") = List::create(rownames(m), colnames(m)); 
   int sz1 = n*k-1;
-  //NumericMatrix::iterator mit, zit;
   typename T::iterator mit, zit;
   for (mit = m.begin(), zit = z.begin(); mit != m.end(); mit++, zit += n) {
   	if (zit >= z.end()) zit -= sz1;
@@ -40,68 +33,15 @@ NumericMatrix _toRowProbs(NumericMatrix x) {
   return out;
 }
 
-NumericVector _rowSumsC(NumericMatrix x) {
-  int nrow = x.nrow(), ncol = x.ncol();
-  NumericVector out(nrow);
-
-  for (int i = 0; i < nrow; i++) {
-    double total = 0;
-    for (int j = 0; j < ncol; j++) 
-      total += x(i, j);
-    out[i] = total;
-  }
-  return out;
-}
-
-// createSequenceMatrix<-function(stringchar, toRowProbs=FALSE,sanitize=TRUE)
 // [[Rcpp::export]]
 NumericMatrix createSequenceMatrix_cpp(CharacterVector stringchar, bool toRowProbs=false, bool sanitize=true) {
-//NumericMatrix createSequenceMatrix_cpp(DataFrame stringchar, bool toRowProbs=false, bool sanitize=true) {
-/* 
-  elements <- sort(unique(stringchar))
-  sizeMatr <- length(elements)
-  freqMatrix <- zeros(sizeMatr)
-  rownames(freqMatrix) <- elements
-  colnames(freqMatrix) <- elements
-  for(i in 1:(length(stringchar)-1))
-  {
-    posFrom <- which(rownames(freqMatrix)==stringchar[i])
-    posTo <- which(rownames(freqMatrix)==stringchar[i+1])
-    freqMatrix[posFrom,posTo]=freqMatrix[posFrom,posTo]+1
-  }
-  #sanitizing if any row in the matrix sums to zero by posing the corresponding diagonal equal to 1/dim
-  if(sanitize==TRUE)
-  {
-	  if(any(rowSums(freqMatrix)==0))
-	  {
-		  indexesToBeSanitized<-which(rowSums(freqMatrix)==0)
-		  for(i in indexesToBeSanitized) {
-			  for(j in 1:sizeMatr) freqMatrix[i,j]<-1/sizeMatr
-		  }
-	  }
-  }
-  if(toRowProbs==TRUE)
-  {
-    freqMatrix<-freqMatrix/rowSums(freqMatrix)
-  }
-  return(freqMatrix)
-*/
-//  Rcout << stringchar[0] << endl;
-  //Rf_PrintValue(stringchar);
-//  [1] "a" "b" "a" "a" "a" "a" "b" "a" "b" "a" "b" "a" "a" "b" "b" "b" "a"
-  
   CharacterVector elements = unique(stringchar).sort();
-  //Rf_PrintValue(elements);
   int sizeMatr = elements.size();
-  //Rcout << sizeMatr << endl;
   
   NumericMatrix freqMatrix(sizeMatr);
   freqMatrix.attr("dimnames") = List::create(elements, elements); 
-//  Rf_PrintValue(rownames(freqMatrix));
-//  Rf_PrintValue(colnames(freqMatrix));
-  //Rf_PrintValue(freqMatrix.names());
   CharacterVector rnames = rownames(freqMatrix);
-//  Rf_PrintValue(freqMatrix);
+
   int posFrom, posTo;
   for(int i = 0; i < stringchar.size() - 1; i ++) {
 	for (int j = 0; j < rnames.size(); j ++) {
@@ -609,64 +549,35 @@ List markovchainFit_cpp(SEXP data, String method="mle", bool byrow=true, int nbo
 //List markovchainFit_cpp(SEXP data, String method="mle", bool byrow=true, int nboot=10, double laplacian=0, String name="", bool parallel=false) {
 //List markovchainFit_cpp(SEXP data, String method="mle", bool byrow=true, int nboot=10, double laplacian=0, String name="", bool parallel=true) {
   List out;
- // Rf_PrintValue(data);
   //if(class(data) %in% c("data.frame","matrix")) {
   if(Rf_inherits(data, "data.frame") || Rf_inherits(data, "matrix")) { 
 	CharacterMatrix mat;
-    	//#if data is a data.frame forced to matrix
-    	//if(data.attr("class") == "data.frame") data =as.matrix(data);
+    	//if data is a data.frame forced to matrix
   	if(Rf_inherits(data, "data.frame")) {
-//  		Rcout << "data.frame to matrix" << endl;
 		DataFrame df(data);
-		//data2 = internal::convert_using_rfunction(df, "as.matrix");
-		//Function asMatrix("as.matrix"); // 2x faster than convert_using_frunction
-		//mat = asMatrix(df);
 		mat = CharacterMatrix(df.nrows(), df.size());
 		for(int i = 0; i < df.size(); i++)
 			mat(_,i) = CharacterVector(df[i]);
-//		Rf_PrintValue(mat);
  	} else {
-//  		Rcout << "matrix" << endl;
 		mat = data;
 	}
     	//byrow assumes distinct observations (trajectiories) are per row
     	//otherwise transpose
   	if(!byrow) mat = _transpose(mat);
    	S4 outMc =_matr2Mc(mat,laplacian);
-    	//out<-list(estimate=outMc)
  	out = List::create(_["estimate"] = outMc);
-	//out = List(1);
-	//out["estimate"] = outMc;
   } else {
     if(method == "mle") out = _mcFitMle(data, byrow);
     if(method == "bootstrap") out = _mcFitBootStrap(data, nboot, byrow, parallel);
     if(method == "laplace") out = _mcFitLaplacianSmooth(data, byrow, laplacian);
   }
-//  if(!missing(name)) out$estimate@name<-name
+
   if(name != "") {
     S4 estimate = out["estimate"];
     estimate.slot("name") = name;
+    out["estimate"] = estimate;
   }
-  //((S4)(out["estimate"])).slot("name") = name;
-  //if(!name.empty()) ((S4)out["estimate"]).slot("name") = name;
   return out;
-}
-
-NumericMatrix simplemc(int N, int thin) {
-  NumericMatrix mat(N, 2);
-  double x = 0, y = 0;
-
-  for(int i = 0; i < N; i++) {
-    for(int j = 0; j < thin; j++) {
-      //x = rgamma(1, 3, 1 / (y * y + 4))[0];
-      x = rgamma(1, 3, y * y + 4)[0];
-      y = rnorm(1, 1 / (x + 1), 1 / sqrt(2 * (x + 1)))[0];
-    }
-    mat(i, 0) = x;
-    mat(i, 1) = y;
-  }
-
-  return(mat);
 }
 
 
@@ -674,17 +585,18 @@ NumericMatrix simplemc(int N, int thin) {
 library(microbenchmark)
 sequence <- c("a", "b", "a", "a", "a", "a", "b", "a", "b", "a", "b", "a", "a", "b", "b", "b", "a")
 #sequence <- data.frame(t(sequence))
-#microbenchmark(
-  #markovchainFit(data = sequence)#,
-  #markovchainFit(data = sequence, method="laplace", laplacian=0.1)#,
-  mcfit(data = sequence, method="bootstrap")#,
+microbenchmark(
+  #markovchainFit(data = sequence),
+  #markovchainFit(data = sequence, method="laplace", laplacian=0.1),
+  markovchainFit(data = sequence, method="bootstrap"),
+  #mcfit(data = sequence, method="bootstrap"),
   #markovchainFit(data = sequence, byrow=FALSE)#,
 
   #markovchainFit_cpp(sequence)
   markovchainFit_cpp(sequence, "bootstrap")
   #markovchainFit_cpp(sequence, "laplace", laplacian=0.1)
   #markovchainFit_cpp(sequence, byrow=FALSE)
-#)
+)
 */
 /*  markovchainFit_cpp(sequence)
   #markovchainFit_cpp(sequence, byrow=FALSE)

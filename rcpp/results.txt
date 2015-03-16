@@ -1,0 +1,26 @@
+[mle]
+Unit: microseconds
+                            expr      min        lq       mean    median
+ markovchainFit(data = sequence) 2098.243 2983.8540 3690.91441 3401.5740
+    markovchainFit_cpp(sequence)   31.305   44.0225   65.63944   59.2555
+        uq       max neval
+ 3893.3625 17088.365   100
+   77.1435   223.884   100
+
+[laplace]
+Unit: microseconds
+                                                                 expr      min
+ markovchainFit(data = sequence, method = "laplace", laplacian = 0.1) 2094.609
+             markovchainFit_cpp(sequence, "laplace", laplacian = 0.1)   30.467
+       lq       mean    median        uq       max neval
+ 3190.128 4062.66423 3483.0495 3977.6330 18850.084   100
+   39.830   69.25622   59.1155   74.3485   526.308   100
+
+[bootstrap]
+Unit: milliseconds
+                                                  expr      min       lq
+ markovchainFit(data = sequence, method = "bootstrap") 29.82652 32.97178
+             markovchainFit_cpp(sequence, "bootstrap") 18.69440 21.25075
+     mean   median       uq       max neval
+ 37.38921 35.38209 37.15849 199.02782   100
+ 23.05778 22.70683 24.27276  31.98933   100
