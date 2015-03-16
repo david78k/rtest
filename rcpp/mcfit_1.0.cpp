@@ -1,6 +1,10 @@
 #include <Rcpp.h>
 #include <omp.h>
 #include <unistd.h>
+//#include <random>
+//#include <Environment.h>
+//#include <RcppArmadillo.h>
+//// [[Rcpp::depends(RcppArmadillo)]]
 
 using namespace Rcpp;
 //using namespace std;

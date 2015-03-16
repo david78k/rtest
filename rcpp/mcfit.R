@@ -97,14 +97,14 @@ createSequenceMatrix<-function(stringchar, toRowProbs=FALSE,sanitize=TRUE)
     charseq<-character()
     char<-sample(x=itemset,size=1)
     charseq<-c(charseq,char)
-    print(charseq)
+    #print(charseq)
     for(j in 2:size) #cicle to define the element in a list
     {
       probsVector<-contingencyMatrix[which(rownames(contingencyMatrix)==char),]
       char<-sample(x=itemset,size=1, replace=TRUE,prob=probsVector)
       charseq<-c(charseq,char)
- 	print("probsVector")
-      	print(probsVector)
+ 	#print("probsVector")
+      	#print(probsVector)
     }
     samples[[length(samples)+1]]<-charseq #increase the list
   }
