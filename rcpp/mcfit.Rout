@@ -147,7 +147,8 @@ The following object is masked from ‘package:base’:
 +       probsVector<-contingencyMatrix[which(rownames(contingencyMatrix)==char),]
 +       char<-sample(x=itemset,size=1, replace=TRUE,prob=probsVector)
 +       charseq<-c(charseq,char)
-+       print(probsVector)
++  	print("probsVector")
++       	print(probsVector)
 +     }
 +     samples[[length(samples)+1]]<-charseq #increase the list
 +   }
@@ -319,391 +320,551 @@ The following object is masked from ‘package:base’:
 +     "b", "a", "b", "a", "a", "b", "b", "b", "a")
 
 > mcfit(data = sequence, method = "bootstrap")
-[1] "a"
-a b 
-4 5 
-a b 
-4 5 
-a b 
-4 5 
+[1] "b"
+[1] "probsVector"
 a b 
 5 2 
+[1] "probsVector"
+a b 
+4 5 
+[1] "probsVector"
 a b 
 5 2 
+[1] "probsVector"
 a b 
 4 5 
-a b 
-4 5 
-a b 
-4 5 
-a b 
-4 5 
+[1] "probsVector"
 a b 
 5 2 
+[1] "probsVector"
 a b 
 4 5 
+[1] "probsVector"
 a b 
 5 2 
+[1] "probsVector"
 a b 
 4 5 
+[1] "probsVector"
+a b 
+4 5 
+[1] "probsVector"
 a b 
 5 2 
+[1] "probsVector"
 a b 
 5 2 
+[1] "probsVector"
+a b 
+4 5 
+[1] "probsVector"
+a b 
+5 2 
+[1] "probsVector"
+a b 
+4 5 
+[1] "probsVector"
+a b 
+4 5 
+[1] "probsVector"
 a b 
 5 2 
 [1] "b"
+[1] "probsVector"
 a b 
 5 2 
+[1] "probsVector"
 a b 
 4 5 
+[1] "probsVector"
+a b 
+4 5 
+[1] "probsVector"
 a b 
 5 2 
+[1] "probsVector"
 a b 
 4 5 
+[1] "probsVector"
+a b 
+4 5 
+[1] "probsVector"
+a b 
+4 5 
+[1] "probsVector"
+a b 
+4 5 
+[1] "probsVector"
 a b 
 5 2 
+[1] "probsVector"
 a b 
 4 5 
+[1] "probsVector"
+a b 
+4 5 
+[1] "probsVector"
+a b 
+4 5 
+[1] "probsVector"
+a b 
+4 5 
+[1] "probsVector"
+a b 
+4 5 
+[1] "probsVector"
 a b 
 5 2 
-a b 
-4 5 
-a b 
-5 2 
-a b 
-4 5 
-a b 
-5 2 
-a b 
-4 5 
-a b 
-5 2 
-a b 
-4 5 
-a b 
-5 2 
-a b 
-5 2 
-[1] "a"
-a b 
-4 5 
-a b 
-4 5 
-a b 
-5 2 
-a b 
-5 2 
-a b 
-4 5 
-a b 
-4 5 
-a b 
-4 5 
-a b 
-5 2 
-a b 
-4 5 
-a b 
-5 2 
-a b 
-4 5 
-a b 
-5 2 
-a b 
-4 5 
-a b 
-5 2 
-a b 
-4 5 
-a b 
-5 2 
-[1] "a"
-a b 
-4 5 
-a b 
-5 2 
-a b 
-4 5 
-a b 
-5 2 
-a b 
-4 5 
-a b 
-4 5 
-a b 
-5 2 
-a b 
-4 5 
-a b 
-4 5 
-a b 
-4 5 
-a b 
-4 5 
-a b 
-4 5 
-a b 
-4 5 
-a b 
-4 5 
-a b 
-5 2 
+[1] "probsVector"
 a b 
 4 5 
 [1] "a"
+[1] "probsVector"
 a b 
 4 5 
+[1] "probsVector"
 a b 
 5 2 
-a b 
-4 5 
-a b 
-4 5 
+[1] "probsVector"
 a b 
 5 2 
+[1] "probsVector"
+a b 
+4 5 
+[1] "probsVector"
 a b 
 5 2 
-a b 
-4 5 
-a b 
-4 5 
+[1] "probsVector"
 a b 
 5 2 
-a b 
-4 5 
-a b 
-5 2 
-a b 
-4 5 
-a b 
-4 5 
+[1] "probsVector"
 a b 
 5 2 
+[1] "probsVector"
 a b 
 4 5 
+[1] "probsVector"
 a b 
 5 2 
-[1] "a"
+[1] "probsVector"
 a b 
 4 5 
+[1] "probsVector"
+a b 
+4 5 
+[1] "probsVector"
+a b 
+4 5 
+[1] "probsVector"
 a b 
 5 2 
+[1] "probsVector"
 a b 
 4 5 
+[1] "probsVector"
 a b 
 4 5 
-a b 
-4 5 
-a b 
-5 2 
-a b 
-4 5 
-a b 
-5 2 
-a b 
-5 2 
-a b 
-4 5 
-a b 
-4 5 
-a b 
-5 2 
-a b 
-5 2 
-a b 
-5 2 
-a b 
-4 5 
-a b 
-5 2 
-[1] "a"
-a b 
-4 5 
-a b 
-4 5 
-a b 
-4 5 
-a b 
-5 2 
-a b 
-4 5 
-a b 
-5 2 
-a b 
-5 2 
-a b 
-4 5 
-a b 
-4 5 
-a b 
-4 5 
-a b 
-4 5 
-a b 
-5 2 
-a b 
-5 2 
-a b 
-4 5 
-a b 
-4 5 
+[1] "probsVector"
 a b 
 5 2 
 [1] "b"
+[1] "probsVector"
 a b 
 5 2 
+[1] "probsVector"
 a b 
 4 5 
+[1] "probsVector"
 a b 
 4 5 
-a b 
-4 5 
-a b 
-4 5 
+[1] "probsVector"
 a b 
 5 2 
+[1] "probsVector"
 a b 
 4 5 
+[1] "probsVector"
 a b 
 5 2 
-a b 
-5 2 
+[1] "probsVector"
 a b 
 4 5 
-a b 
-5 2 
-a b 
-5 2 
+[1] "probsVector"
 a b 
 4 5 
+[1] "probsVector"
 a b 
 5 2 
+[1] "probsVector"
 a b 
 4 5 
+[1] "probsVector"
 a b 
 5 2 
+[1] "probsVector"
+a b 
+4 5 
+[1] "probsVector"
+a b 
+5 2 
+[1] "probsVector"
+a b 
+4 5 
+[1] "probsVector"
+a b 
+5 2 
+[1] "probsVector"
+a b 
+4 5 
 [1] "a"
+[1] "probsVector"
 a b 
 4 5 
-a b 
-5 2 
-a b 
-5 2 
+[1] "probsVector"
 a b 
 4 5 
-a b 
-5 2 
-a b 
-4 5 
-a b 
-5 2 
-a b 
-5 2 
+[1] "probsVector"
 a b 
 4 5 
+[1] "probsVector"
 a b 
 5 2 
-a b 
-4 5 
-a b 
-5 2 
-a b 
-4 5 
+[1] "probsVector"
 a b 
 5 2 
+[1] "probsVector"
 a b 
 4 5 
+[1] "probsVector"
+a b 
+4 5 
+[1] "probsVector"
+a b 
+4 5 
+[1] "probsVector"
+a b 
+5 2 
+[1] "probsVector"
+a b 
+5 2 
+[1] "probsVector"
+a b 
+4 5 
+[1] "probsVector"
+a b 
+4 5 
+[1] "probsVector"
+a b 
+4 5 
+[1] "probsVector"
+a b 
+5 2 
+[1] "probsVector"
+a b 
+5 2 
+[1] "probsVector"
+a b 
+4 5 
+[1] "a"
+[1] "probsVector"
+a b 
+4 5 
+[1] "probsVector"
+a b 
+4 5 
+[1] "probsVector"
+a b 
+4 5 
+[1] "probsVector"
+a b 
+5 2 
+[1] "probsVector"
+a b 
+4 5 
+[1] "probsVector"
+a b 
+4 5 
+[1] "probsVector"
+a b 
+4 5 
+[1] "probsVector"
+a b 
+4 5 
+[1] "probsVector"
+a b 
+5 2 
+[1] "probsVector"
+a b 
+4 5 
+[1] "probsVector"
+a b 
+5 2 
+[1] "probsVector"
+a b 
+4 5 
+[1] "probsVector"
+a b 
+5 2 
+[1] "probsVector"
+a b 
+4 5 
+[1] "probsVector"
+a b 
+4 5 
+[1] "probsVector"
 a b 
 5 2 
 [1] "b"
+[1] "probsVector"
 a b 
 5 2 
+[1] "probsVector"
+a b 
+4 5 
+[1] "probsVector"
 a b 
 5 2 
+[1] "probsVector"
 a b 
 4 5 
+[1] "probsVector"
+a b 
+4 5 
+[1] "probsVector"
 a b 
 5 2 
+[1] "probsVector"
 a b 
 4 5 
+[1] "probsVector"
 a b 
 4 5 
+[1] "probsVector"
 a b 
 5 2 
+[1] "probsVector"
 a b 
 4 5 
-a b 
-4 5 
+[1] "probsVector"
 a b 
 5 2 
+[1] "probsVector"
 a b 
 4 5 
+[1] "probsVector"
+a b 
+5 2 
+[1] "probsVector"
 a b 
 4 5 
+[1] "probsVector"
+a b 
+5 2 
+[1] "probsVector"
 a b 
 4 5 
+[1] "b"
+[1] "probsVector"
 a b 
 5 2 
+[1] "probsVector"
 a b 
 5 2 
+[1] "probsVector"
 a b 
 5 2 
+[1] "probsVector"
+a b 
+5 2 
+[1] "probsVector"
+a b 
+4 5 
+[1] "probsVector"
+a b 
+5 2 
+[1] "probsVector"
+a b 
+4 5 
+[1] "probsVector"
+a b 
+5 2 
+[1] "probsVector"
+a b 
+4 5 
+[1] "probsVector"
+a b 
+5 2 
+[1] "probsVector"
+a b 
+4 5 
+[1] "probsVector"
+a b 
+5 2 
+[1] "probsVector"
+a b 
+4 5 
+[1] "probsVector"
+a b 
+5 2 
+[1] "probsVector"
+a b 
+4 5 
+[1] "probsVector"
+a b 
+4 5 
+[1] "a"
+[1] "probsVector"
+a b 
+4 5 
+[1] "probsVector"
+a b 
+5 2 
+[1] "probsVector"
+a b 
+4 5 
+[1] "probsVector"
+a b 
+5 2 
+[1] "probsVector"
+a b 
+4 5 
+[1] "probsVector"
+a b 
+5 2 
+[1] "probsVector"
+a b 
+5 2 
+[1] "probsVector"
+a b 
+5 2 
+[1] "probsVector"
+a b 
+4 5 
+[1] "probsVector"
+a b 
+5 2 
+[1] "probsVector"
+a b 
+4 5 
+[1] "probsVector"
+a b 
+5 2 
+[1] "probsVector"
+a b 
+4 5 
+[1] "probsVector"
+a b 
+5 2 
+[1] "probsVector"
+a b 
+4 5 
+[1] "probsVector"
+a b 
+5 2 
+[1] "b"
+[1] "probsVector"
+a b 
+5 2 
+[1] "probsVector"
+a b 
+4 5 
+[1] "probsVector"
+a b 
+4 5 
+[1] "probsVector"
+a b 
+5 2 
+[1] "probsVector"
+a b 
+5 2 
+[1] "probsVector"
+a b 
+4 5 
+[1] "probsVector"
+a b 
+4 5 
+[1] "probsVector"
+a b 
+5 2 
+[1] "probsVector"
+a b 
+4 5 
+[1] "probsVector"
+a b 
+5 2 
+[1] "probsVector"
+a b 
+4 5 
+[1] "probsVector"
+a b 
+5 2 
+[1] "probsVector"
+a b 
+5 2 
+[1] "probsVector"
+a b 
+4 5 
+[1] "probsVector"
+a b 
+4 5 
+[1] "probsVector"
+a b 
+4 5 
 $estimate
 BootStrap Estimate 
  A  2 - dimensional discrete Markov Chain with following states 
  1 2 
  The transition matrix   (by rows)  is defined as follows 
           1         2
-1 0.3738889 0.6261111
-2 0.7382937 0.2617063
+1 0.3695058 0.6304942
+2 0.7847619 0.2152381
 
 
 $standardError
           [,1]      [,2]
-[1,] 0.2281884 0.2281884
-[2,] 0.1475845 0.1475845
+[1,] 0.2200327 0.2200327
+[2,] 0.1785219 0.1785219
 
 $bootStrapSamples
 $bootStrapSamples[[1]]
-          a         b
-a 0.5555556 0.4444444
-b 0.5714286 0.4285714
+      a     b
+a 0.250 0.750
+b 0.875 0.125
 
 $bootStrapSamples[[2]]
-          a         b
-a 0.0000000 1.0000000
-b 0.8888889 0.1111111
+     a    b
+a 0.75 0.25
+b 1.00 0.00
 
 $bootStrapSamples[[3]]
-          a         b
-a 0.3333333 0.6666667
-b 0.8571429 0.1428571
+      a     b
+a 0.375 0.625
+b 0.625 0.375
 
 $bootStrapSamples[[4]]
           a         b
-a 0.6666667 0.3333333
+a 0.2222222 0.7777778
 b 1.0000000 0.0000000
 
 $bootStrapSamples[[5]]
-          a         b
-a 0.3333333 0.6666667
-b 0.8571429 0.1428571
+    a   b
+a 0.6 0.4
+b 0.5 0.5
 
 $bootStrapSamples[[6]]
-      a     b
-a 0.375 0.625
-b 0.625 0.375
+          a         b
+a 0.5454545 0.4545455
+b 0.8000000 0.2000000
 
 $bootStrapSamples[[7]]
           a         b
-a 0.6000000 0.4000000
-b 0.6666667 0.3333333
+a 0.2222222 0.7777778
+b 1.0000000 0.0000000
 
 $bootStrapSamples[[8]]
-      a     b
-a 0.375 0.625
-b 0.625 0.375
+          a         b
+a 0.2857143 0.7142857
+b 0.6666667 0.3333333
 
 $bootStrapSamples[[9]]
           a         b
@@ -711,9 +872,9 @@ a 0.0000000 1.0000000
 b 0.6666667 0.3333333
 
 $bootStrapSamples[[10]]
-      a     b
-a 0.500 0.500
-b 0.625 0.375
+          a         b
+a 0.4444444 0.5555556
+b 0.7142857 0.2857143
 
 
 
@@ -721,231 +882,231 @@ b 0.625 0.375
   a b
 a 4 5
 b 5 2
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-0 a
-0 a
-0 a
-0 a
-0 a
-0 a
-0 a
-0 a
-0 a
-0 a
-0 a
-0 a
-0 a
-0 a
-0 a
-0 a
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-0 a
-0 a
-0 a
-0 a
-0 a
-0 a
-0 a
-0 a
-0 a
-0 a
-0 a
-0 a
-0 a
-0 a
-0 a
-0 a
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-1 b
-0 a
-0 a
-0 a
-0 a
-0 a
-0 a
-0 a
-0 a
-0 a
-0 a
-0 a
-0 a
-0 a
-0 a
-0 a
-0 a
+[1] "a"
+[1] "b"
+[1] "a"
+[1] "b"
+[1] "a"
+[1] "b"
+[1] "b"
+[1] "a"
+[1] "b"
+[1] "b"
+[1] "b"
+[1] "b"
+[1] "b"
+[1] "a"
+[1] "a"
+[1] "b"
+[1] "a"
+[1] "a"
+[1] "a"
+[1] "a"
+[1] "b"
+[1] "a"
+[1] "a"
+[1] "b"
+[1] "b"
+[1] "a"
+[1] "a"
+[1] "b"
+[1] "a"
+[1] "b"
+[1] "a"
+[1] "b"
+[1] "a"
+[1] "a"
+[1] "a"
+[1] "b"
+[1] "a"
+[1] "b"
+[1] "a"
+[1] "a"
+[1] "b"
+[1] "a"
+[1] "b"
+[1] "a"
+[1] "a"
+[1] "a"
+[1] "b"
+[1] "a"
+[1] "b"
+[1] "b"
+[1] "a"
+[1] "a"
+[1] "a"
+[1] "b"
+[1] "b"
+[1] "b"
+[1] "a"
+[1] "b"
+[1] "a"
+[1] "a"
+[1] "a"
+[1] "a"
+[1] "b"
+[1] "b"
+[1] "a"
+[1] "b"
+[1] "b"
+[1] "a"
+[1] "a"
+[1] "a"
+[1] "b"
+[1] "a"
+[1] "b"
+[1] "a"
+[1] "a"
+[1] "b"
+[1] "b"
+[1] "a"
+[1] "b"
+[1] "a"
+[1] "a"
+[1] "a"
+[1] "b"
+[1] "a"
+[1] "b"
+[1] "b"
+[1] "a"
+[1] "a"
+[1] "b"
+[1] "b"
+[1] "a"
+[1] "b"
+[1] "b"
+[1] "a"
+[1] "a"
+[1] "b"
+[1] "a"
+[1] "b"
+[1] "a"
+[1] "a"
+[1] "b"
+[1] "a"
+[1] "b"
+[1] "a"
+[1] "b"
+[1] "a"
+[1] "b"
+[1] "a"
+[1] "b"
+[1] "a"
+[1] "a"
+[1] "b"
+[1] "b"
+[1] "b"
+[1] "b"
+[1] "a"
+[1] "b"
+[1] "a"
+[1] "b"
+[1] "b"
+[1] "a"
+[1] "a"
+[1] "a"
+[1] "a"
+[1] "a"
+[1] "b"
+[1] "a"
+[1] "b"
+[1] "a"
+[1] "a"
+[1] "b"
+[1] "a"
+[1] "a"
+[1] "a"
+[1] "a"
+[1] "a"
+[1] "b"
+[1] "a"
+[1] "b"
+[1] "a"
+[1] "b"
+[1] "a"
+[1] "b"
+[1] "b"
+[1] "a"
+[1] "b"
+[1] "a"
+[1] "a"
+[1] "a"
+[1] "a"
+[1] "b"
+[1] "a"
+[1] "b"
+[1] "a"
+[1] "a"
+[1] "b"
+[1] "a"
+[1] "a"
+[1] "a"
+[1] "a"
 $estimate
 BootStrap Estimate 
  A  2 - dimensional discrete Markov Chain with following states 
  a b 
  The transition matrix   (by rows)  is defined as follows 
           a         b
-a 0.6454779 0.3545221
-b 0.8083333 0.1916667
+a 0.4398485 0.5601515
+b 0.7541667 0.2458333
 
 
 $standardError
           a         b
-a 0.2447154 0.2447154
-b 0.2707158 0.2707158
+a 0.1386495 0.1386495
+b 0.2146171 0.2146171
 
 $bootStrapSamples
 $bootStrapSamples[[1]]
-     a    b
-a 0.75 0.25
-b 1.00 0.00
+          a         b
+a 0.1666667 0.8333333
+b 0.5000000 0.5000000
 
 $bootStrapSamples[[2]]
           a         b
-a 0.6363636 0.3636364
-b 1.0000000 0.0000000
+a 0.5000000 0.5000000
+b 0.8333333 0.1666667
 
 $bootStrapSamples[[3]]
           a         b
-a 0.1666667 0.8333333
-b 0.4000000 0.6000000
+a 0.5454545 0.4545455
+b 1.0000000 0.0000000
 
 $bootStrapSamples[[4]]
           a         b
-a 0.7692308 0.2307692
-b 1.0000000 0.0000000
+a 0.5555556 0.4444444
+b 0.4285714 0.5714286
 
 $bootStrapSamples[[5]]
-          a         b
-a 0.6363636 0.3636364
-b 0.6000000 0.4000000
+      a     b
+a 0.375 0.625
+b 0.750 0.250
 
 $bootStrapSamples[[6]]
-     a    b
-a 0.75 0.25
-b 1.00 0.00
+      a     b
+a 0.375 0.625
+b 0.625 0.375
 
 $bootStrapSamples[[7]]
-          a         b
-a 0.8461538 0.1538462
-b 1.0000000 0.0000000
+    a   b
+a 0.3 0.7
+b 1.0 0.0
 
 $bootStrapSamples[[8]]
           a         b
-a 0.9000000 0.1000000
-b 0.3333333 0.6666667
+a 0.4444444 0.5555556
+b 0.5714286 0.4285714
 
 $bootStrapSamples[[9]]
-     a    b
-a 0.75 0.25
-b 1.00 0.00
+          a         b
+a 0.5000000 0.5000000
+b 0.8333333 0.1666667
 
 $bootStrapSamples[[10]]
-     a    b
-a 0.25 0.75
-b 0.75 0.25
+          a         b
+a 0.6363636 0.3636364
+b 1.0000000 0.0000000
 
 
 Warning message:
@@ -963,4 +1124,4 @@ In fun(libname, pkgname) : no DISPLAY variable so Tk is not available
 > 
 > proc.time()
    user  system elapsed 
- 11.311   2.567  14.124 
+ 10.815   2.627  13.601 

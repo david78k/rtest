@@ -103,7 +103,8 @@ createSequenceMatrix<-function(stringchar, toRowProbs=FALSE,sanitize=TRUE)
       probsVector<-contingencyMatrix[which(rownames(contingencyMatrix)==char),]
       char<-sample(x=itemset,size=1, replace=TRUE,prob=probsVector)
       charseq<-c(charseq,char)
-      print(probsVector)
+ 	print("probsVector")
+      	print(probsVector)
     }
     samples[[length(samples)+1]]<-charseq #increase the list
   }

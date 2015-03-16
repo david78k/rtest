@@ -323,6 +323,7 @@ List _bootstrapCharacterSequences(CharacterVector stringchar, int n, int size=-1
 	CharacterVector charseq;	
 	int rnd = rand()%itemsetsize;
  	String ch = itemset[rnd];
+ 	//Rcout << std::string(ch) << std::endl;
 	//Rcout << rnd << " " << itemset[rnd] << endl;
 	//Rf_PrintValue(ch);
 //	res = sample(itemset, 1);
@@ -333,26 +334,26 @@ List _bootstrapCharacterSequences(CharacterVector stringchar, int n, int size=-1
 	//Rf_PrintValue(charseq);
 	for(int j = 1; j < size; j ++) {
 		NumericVector probsVector;
-		for(int k = 0; k < itemsetsize; k ++) 
+		for(int k = 0; k < itemsetsize; k ++) {
 			if((std::string)itemset[k] == (std::string) ch) {
 				probsVector = contingencyMatrix(k, _);	
-				Rcout << k << " " << (std::string)ch << std::endl;
+				//Rcout << k << " " << (std::string)ch << std::endl;
 				//Rf_PrintValue(probsVector);
 				break;
 			}
+		}
 		//Rf_PrintValue(probsVector);
   		//srand(time(NULL));
 		//rnd = rand()%itemsetsize;
  		//ch = itemset[rnd];
 		res = sample(itemset, 1, true, probsVector);
-		//Rcout << res[0] << endl;
-		//Rcout << "res[0]" << endl;
-		//Rf_PrintValue(res[0]);
+		//Rcout << "sampled: " << (std::string)res[0] << endl;
+		Rf_PrintValue(res[0]);
 		CharacterVector v = res[0];
 		//Rf_PrintValue(res[0]);
 		//Rf_PrintValue(character);
-		charseq.push_back(v[0]);
-		//charseq.push_back(ch);
+		ch = v[0];
+		charseq.push_back(ch);
  	}
 	//samples[[samples.size() + 1]] = charseq;
 	samples.push_back(charseq);
