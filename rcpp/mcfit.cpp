@@ -117,10 +117,14 @@ List _mcFitMle(CharacterVector stringchar, bool byrow, double confidencelevel=95
   NumericMatrix lowerEndpointMatr = NumericMatrix(initialMatr.nrow(), initialMatr.ncol());
   NumericMatrix upperEndpointMatr = NumericMatrix(initialMatr.nrow(), initialMatr.ncol());
 
+  double marginOfError, lowerEndpoint, upperEndpoint;
   for(int i = 0; i < initialMatr.nrow(); i ++) {
 	for(int j = 0; j < initialMatr.ncol(); j ++) {
-		lowerEndpointMatr(i,j) = std::max(0.0, std::min(1.0, initialMatr(i, j) - zscore * initialMatr(i,j) / sqrt(freqMatr(i,j))));
-		upperEndpointMatr(i,j) = std::max(0.0, std::min(1.0, initialMatr(i, j) + zscore * initialMatr(i,j) / sqrt(freqMatr(i,j))));
+		marginOfError = zscore * initialMatr(i, j) / sqrt(freqMatr(i, j));
+		lowerEndpoint = initialMatr(i, j) - marginOfError;
+		upperEndpoint = initialMatr(i, j) + marginOfError;
+		lowerEndpointMatr(i,j) = (lowerEndpoint > 1.0) ? 1.0 : ((0.0 > lowerEndpoint) ? 0.0 : lowerEndpoint);
+		upperEndpointMatr(i,j) = (upperEndpoint > 1.0) ? 1.0 : ((0.0 > upperEndpoint) ? 0.0 : upperEndpoint);
   	}
   }
   lowerEndpointMatr.attr("dimnames") = List::create(elements, elements); 
@@ -131,7 +135,9 @@ List _mcFitMle(CharacterVector stringchar, bool byrow, double confidencelevel=95
   outMc.slot("name") = "MLE Fit";  
   
   return List::create(_["estimate"] = outMc
-		, _["confidenceInterval"] = List::create(lowerEndpointMatr, upperEndpointMatr)
+		, _["confidenceInterval"] = List::create(_["confidenceLevel"]=confidencelevel, 
+							_["lowerEndpointMatrix"]=lowerEndpointMatr, 
+							_["upperEndpointMatrix"]=upperEndpointMatr)
 	);
 }
 
@@ -324,19 +330,19 @@ List markovchainFit_cpp(SEXP data, String method="mle", bool byrow=true, int nbo
 /*** R 
 library(microbenchmark)
 sequence <- c("a", "b", "a", "a", "a", "a", "b", "a", "b", "a", "b", "a", "a", "b", "b", "b", "a")
-sequence <- data.frame(t(sequence))
-microbenchmark(
-  #markovchainFit(data = sequence),
+#sequence <- data.frame(t(sequence))
+#microbenchmark(
+  markovchainFit(data = sequence)
   #markovchainFit(data = sequence, method="laplace", laplacian=0.1),
-  markovchainFit(data = sequence, method="bootstrap"),
+  #markovchainFit(data = sequence, method="bootstrap"),
   #mcfit(data = sequence, method="bootstrap"),
   #markovchainFit(data = sequence, byrow=FALSE)#,
 
-  #markovchainFit_cpp(sequence)
+  markovchainFit_cpp(sequence)
   #markovchainFit_cpp(sequence, "laplace", laplacian=0.1)
-  markovchainFit_cpp(sequence, "bootstrap")
+  #markovchainFit_cpp(sequence, "bootstrap")
   #markovchainFit_cpp(sequence, byrow=FALSE)
-)
+#)
 */
 /*  markovchainFit_cpp(sequence)
   #markovchainFit_cpp(sequence, byrow=FALSE)

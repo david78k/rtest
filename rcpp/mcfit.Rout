@@ -319,18 +319,44 @@ The following object is masked from ‘package:base’:
 > sequence <- c("a", "b", "a", "a", "a", "a", "b", "a", 
 +     "b", "a", "b", "a", "a", "b", "b", "b", "a")
 
-> sequence <- data.frame(t(sequence))
+> markovchainFit(data = sequence)
+$estimate
+MLE Fit 
+ A  2 - dimensional discrete Markov Chain with following states 
+ a b 
+ The transition matrix   (by rows)  is defined as follows 
+          a         b
+a 0.4444444 0.5555556
+b 0.7142857 0.2857143
 
-> microbenchmark(markovchainFit(data = sequence, method = "bootstrap"), 
-+     markovchainFit_cpp(sequence, "bootstrap"))
-Loading required namespace: multcomp
-Unit: microseconds
-                                                  expr      min        lq
- markovchainFit(data = sequence, method = "bootstrap") 3792.042 4823.4145
-             markovchainFit_cpp(sequence, "bootstrap")  233.666  284.8155
-      mean   median       uq       max neval
- 5750.3758 5380.468 5838.995 18047.905   100
-  392.0032  345.329  464.817   811.403   100
+
+
+> markovchainFit_cpp(sequence)
+$estimate
+MLE Fit 
+ A  2 - dimensional discrete Markov Chain with following states 
+ a b 
+ The transition matrix   (by rows)  is defined as follows 
+          a         b
+a 0.4444444 0.5555556
+b 0.7142857 0.2857143
+
+
+$confidenceInterval
+$confidenceInterval$confidenceLevel
+[1] 95
+
+$confidenceInterval$lowerEndpointMatrix
+            a          b
+a 0.008888889 0.06858964
+b 0.088186681 0.00000000
+
+$confidenceInterval$upperEndpointMatrix
+     a         b
+a 0.88 1.0000000
+b 1.00 0.6816941
+
+
 Warning message:
 In fun(libname, pkgname) : no DISPLAY variable so Tk is not available
 > 
@@ -346,4 +372,4 @@ In fun(libname, pkgname) : no DISPLAY variable so Tk is not available
 > 
 > proc.time()
    user  system elapsed 
- 11.472   4.036  15.521 
+ 10.889   2.413  13.380 
