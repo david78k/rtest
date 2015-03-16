@@ -15,7 +15,7 @@ T _transpose(T & m) {
   	if (zit >= z.end()) zit -= sz1;
         *zit = *mit;
   }
-  return(z);
+  return (z);
 }
 
 NumericMatrix _toRowProbs(NumericMatrix x) {
@@ -70,7 +70,7 @@ NumericMatrix createSequenceMatrix_cpp(CharacterVector stringchar, bool toRowPro
 }
 
 List _mcFitMle(CharacterVector stringchar, bool byrow, double confidencelevel=95.0) {
-  // get initialMatr and freqMatr at the same time for speedup
+  // get initialMatr and freqMatr 
   CharacterVector elements = unique(stringchar).sort();
   int sizeMatr = elements.size();
   
@@ -80,7 +80,7 @@ List _mcFitMle(CharacterVector stringchar, bool byrow, double confidencelevel=95
 
   int posFrom, posTo;
   for(int i = 0; i < stringchar.size() - 1; i ++) {
-	for (int j = 0; j < elements.size(); j ++) {
+	for (int j = 0; j < sizeMatr; j ++) {
 		if(stringchar[i] == elements[j]) posFrom = j;
 		if(stringchar[i + 1] == elements[j]) posTo = j;
 	}
