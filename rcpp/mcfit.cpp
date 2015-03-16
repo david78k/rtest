@@ -515,16 +515,14 @@ S4 _matr2Mc(CharacterMatrix matrData, double laplacian=0) {
 	}
   }
 
-  //#add laplacian correction if needed
-  //contingencyMatrix=contingencyMatrix+laplacian
-  //NumericMatrix transitionMatrix (usize, usize);
+  //add laplacian correction if needed
   for(int i = 0; i < usize; i ++) {
 	double rowSum = 0;
 	for(int j = 0; j < usize; j ++) {
     		contingencyMatrix(i,j) += laplacian;
     		rowSum += contingencyMatrix(i,j);
   	}
-  	//#get a transition matrix and a DTMC
+  	//get a transition matrix and a DTMC
 	for(int j = 0; j < usize; j ++) 
     		//transitionMatrix(i,j) = contingencyMatrix(i,j)/rowSum;
     		contingencyMatrix(i,j) /= rowSum;
@@ -533,21 +531,14 @@ S4 _matr2Mc(CharacterMatrix matrData, double laplacian=0) {
   //transitionMatrix<-contingencyMatrix/rowSums(contingencyMatrix);
   //outMc<-new("markovchain",transitionMatrix=transitionMatrix);
   
-  //Function newClass("new");
   S4 outMc("markovchain");
   outMc.slot("transitionMatrix") = contingencyMatrix;
-  //outMc = (NumericMatrix)newClass("markovchain", contingencyMatrix);
-  //outMc =new("markovchain",contingencyMatrix);
 
   return(outMc);
 }
 
-
-// markovchainFit<-function(data,method="mle", byrow=TRUE,nboot=10,laplacian=0, name, parallel=FALSE)
 // [[Rcpp::export]]
 List markovchainFit_cpp(SEXP data, String method="mle", bool byrow=true, int nboot=10, double laplacian=0, String name="", bool parallel=false, double confidencelevel=0.95) {
-//List markovchainFit_cpp(SEXP data, String method="mle", bool byrow=true, int nboot=10, double laplacian=0, String name="", bool parallel=false) {
-//List markovchainFit_cpp(SEXP data, String method="mle", bool byrow=true, int nboot=10, double laplacian=0, String name="", bool parallel=true) {
   List out;
   //if(class(data) %in% c("data.frame","matrix")) {
   if(Rf_inherits(data, "data.frame") || Rf_inherits(data, "matrix")) { 
@@ -585,18 +576,18 @@ List markovchainFit_cpp(SEXP data, String method="mle", bool byrow=true, int nbo
 library(microbenchmark)
 sequence <- c("a", "b", "a", "a", "a", "a", "b", "a", "b", "a", "b", "a", "a", "b", "b", "b", "a")
 #sequence <- data.frame(t(sequence))
-microbenchmark(
-  #markovchainFit(data = sequence),
+#microbenchmark(
+  markovchainFit(data = sequence)
   #markovchainFit(data = sequence, method="laplace", laplacian=0.1),
-  markovchainFit(data = sequence, method="bootstrap"),
+  #markovchainFit(data = sequence, method="bootstrap")#,
   #mcfit(data = sequence, method="bootstrap"),
   #markovchainFit(data = sequence, byrow=FALSE)#,
 
-  #markovchainFit_cpp(sequence)
-  markovchainFit_cpp(sequence, "bootstrap")
+  markovchainFit_cpp(sequence)
+  #markovchainFit_cpp(sequence, "bootstrap")
   #markovchainFit_cpp(sequence, "laplace", laplacian=0.1)
   #markovchainFit_cpp(sequence, byrow=FALSE)
-)
+#)
 */
 /*  markovchainFit_cpp(sequence)
   #markovchainFit_cpp(sequence, byrow=FALSE)
