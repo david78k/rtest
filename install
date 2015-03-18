@@ -1,0 +1,8 @@
+#!/bin/bash
+pkg=markovchainTaeSeungKang
+
+# create binary package
+R CMD INSTALL --build $pkg
+
+# remove package
+#R CMD REMOVE $pkg

@@ -1,0 +1,49 @@
+
+R version 3.0.2 (2013-09-25) -- "Frisbee Sailing"
+Copyright (C) 2013 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> library("Rcpp")
+> 
+> Rcpp.package.skeleton("markovchainTaeSeungKang", example_code = FALSE,
++ 			cpp_files = c("1_functions4Fitting.cpp"))
+Loading required namespace: pkgKitten
+Creating directories ...
+Creating DESCRIPTION ...
+Creating NAMESPACE ...
+Creating Read-and-delete-me ...
+Saving functions and data ...
+Making help files ...
+Done.
+Further steps are described in './markovchainTaeSeungKang/Read-and-delete-me'.
+
+Adding Rcpp settings
+ >> added Imports: Rcpp
+ >> added LinkingTo: Rcpp
+ >> added useDynLib directive to NAMESPACE
+ >> added importFrom(Rcpp, evalCpp) directive to NAMESPACE
+ >> copied 1_functions4Fitting.cpp to src directory
+> 
+> sourceCpp("compileAttributes.cpp")
+compileAttributes.cpp:3:26: error: expected constructor, destructor, or type conversion before ‘;’ token
+ Rcpp::compileAttributes();
+                          ^
+make: *** [compileAttributes.o] Error 1
+g++ -I/usr/share/R/include -DNDEBUG    -I"/usr/local/lib/R/site-library/Rcpp/include" -I"/media/sf_GitHub/rtest/markovchainTaeSeungKang/src" -I"/media/sf_GitHub/rtest/markovchainTaeSeungKang/src/../inst/include"    -fpic  -O3 -pipe  -g  -c compileAttributes.cpp -o compileAttributes.o
+Error in sourceCpp("compileAttributes.cpp") : 
+  Error 1 occurred building shared library.
+Execution halted

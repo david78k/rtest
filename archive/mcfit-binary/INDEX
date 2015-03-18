@@ -1,0 +1,25 @@
+absorbingStates         Various function to perform statistical and
+                        probabilistic analysis
+blanden                 Mobility between income quartiles
+conditionalDistribution
+                        'conditionalDistribution' of a Markov Chain
+craigsendi              CD4 cells counts on HIV Infects between zero
+                        and six month
+firstPassage            First passage across states
+holson                  Holson data set
+is.accessible           Verify if a state j is reachable from state i.
+is.irreducible          Function to check if a Markov chain is
+                        irreducible
+markovchain-class       Class '"markovchain"'
+markovchain-package     Easy Handling Discrete Time Markov Chains
+markovchainFit          Function to fit a discrete Markov chain
+markovchainList-class   Class '"markovchainList"'
+markovchainListFit      Fit a markovchainList
+preproglucacon          Preprogluccacon DNA protein bases sequences
+rain                    Alofi island daily rainfall
+rmarkovchain            Function to generate a sequence of states from
+                        homogeneous or non-homogeneous Markov chains.
+states                  Defined states of a transition matrix
+steadyStates            Stationary states of a 'markovchain' objeect
+transitionProbability   Function to get the transition probabilities
+                        from initial to subsequent status.
