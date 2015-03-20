@@ -1,0 +1,4 @@
+Rscript lab.R
+
+#eog rawratings.png
+#eog histogram.png
