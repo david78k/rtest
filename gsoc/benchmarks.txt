@@ -1,0 +1,225 @@
+[Test sequence]
+sequence <- c("a", "b", "a", "a", "a", "a", "b", "a", "b", "a", "b", "a", "a", "b", "b", "b", "a")
+
+[mle]
+Unit: microseconds
+                            expr      min        lq       mean    median
+ markovchainFit(data = sequence) 2098.243 2983.8540 3690.91441 3401.5740
+    markovchainFit_cpp(sequence)   31.305   44.0225   65.63944   59.2555
+        uq       max neval
+ 3893.3625 17088.365   100
+   77.1435   223.884   100
+
+> markovchainFit(data = sequence)
+$estimate
+MLE Fit
+ A  2 - dimensional discrete Markov Chain with following states
+ a b
+ The transition matrix   (by rows)  is defined as follows
+          a         b
+a 0.4444444 0.5555556
+b 0.7142857 0.2857143
+
+
+
+> markovchainFit_cpp(sequence)
+$estimate
+MLE Fit
+ A  2 - dimensional discrete Markov Chain with following states
+ a b
+ The transition matrix   (by rows)  is defined as follows
+          a         b
+a 0.4444444 0.5555556
+b 0.7142857 0.2857143
+
+
+$confidenceInterval
+$confidenceInterval[[1]]
+            a          b
+a 0.008888889 0.06858964
+b 0.088186681 0.00000000
+
+$confidenceInterval[[2]]
+     a         b
+a 0.88 1.0000000
+b 1.00 0.6816941
+
+[laplace]
+Unit: microseconds
+                                                                 expr      min
+ markovchainFit(data = sequence, method = "laplace", laplacian = 0.1) 2094.609
+             markovchainFit_cpp(sequence, "laplace", laplacian = 0.1)   30.467
+       lq       mean    median        uq       max neval
+ 3190.128 4062.66423 3483.0495 3977.6330 18850.084   100
+   39.830   69.25622   59.1155   74.3485   526.308   100
+
+> markovchainFit(data = sequence, method = "laplace",
++     laplacian = 0.1)
+$estimate
+Laplacian Smooth Fit
+ A  2 - dimensional discrete Markov Chain with following states
+ a b
+ The transition matrix   (by rows)  is defined as follows
+          a         b
+a 0.4456522 0.5543478
+b 0.7083333 0.2916667
+
+
+
+> markovchainFit_cpp(sequence, "laplace", laplacian = 0.1)
+$estimate
+Laplacian Smooth Fit
+ A  2 - dimensional discrete Markov Chain with following states
+ a b
+ The transition matrix   (by rows)  is defined as follows
+          a         b
+a 0.4456522 0.5543478
+b 0.7083333 0.2916667
+
+
+[bootstrap]
+Unit: microseconds
+                                                  expr      min        lq
+ markovchainFit(data = sequence, method = "bootstrap") 3533.780 4553.1340
+             markovchainFit_cpp(sequence, "bootstrap")  102.858  270.8405
+      mean    median       uq       max neval
+ 5764.0575 5139.2555 6177.756 19500.492   100
+  379.1264  327.1605  460.345  1198.796   100
+
+
+> markovchainFit(data = sequence, method = "bootstrap")
+$estimate
+BootStrap Estimate
+ A  2 - dimensional discrete Markov Chain with following states
+ 1 2
+ The transition matrix   (by rows)  is defined as follows
+          1         2
+1 0.3535714 0.6464286
+2 0.7834127 0.2165873
+
+
+$standardError
+          [,1]      [,2]
+[1,] 0.1337156 0.1337156
+[2,] 0.1319565 0.1319565
+
+$bootStrapSamples
+$bootStrapSamples[[1]]
+          a         b
+a 0.1666667 0.8333333
+b 0.6000000 0.4000000
+
+$bootStrapSamples[[2]]
+          a         b
+a 0.6000000 0.4000000
+b 0.8333333 0.1666667
+
+$bootStrapSamples[[3]]
+          a         b
+a 0.3333333 0.6666667
+b 0.8571429 0.1428571
+
+$bootStrapSamples[[4]]
+          a         b
+a 0.4444444 0.5555556
+b 0.7142857 0.2857143
+
+$bootStrapSamples[[5]]
+     a    b
+a 0.25 0.75
+b 0.75 0.25
+
+$bootStrapSamples[[6]]
+          a         b
+a 0.3333333 0.6666667
+b 0.8571429 0.1428571
+
+$bootStrapSamples[[7]]
+          a         b
+a 0.2857143 0.7142857
+b 0.5555556 0.4444444
+
+$bootStrapSamples[[8]]
+          a         b
+a 0.5000000 0.5000000
+b 0.8333333 0.1666667
+
+$bootStrapSamples[[9]]
+          a         b
+a 0.2222222 0.7777778
+b 1.0000000 0.0000000
+
+$bootStrapSamples[[10]]
+          a         b
+a 0.4000000 0.6000000
+b 0.8333333 0.1666667
+
+
+
+> markovchainFit_cpp(sequence, "bootstrap")
+$estimate
+BootStrap Estimate
+ A  2 - dimensional discrete Markov Chain with following states
+ a b
+ The transition matrix   (by rows)  is defined as follows
+          a         b
+a 0.4023629 0.5976371
+b 0.7214286 0.2785714
+
+
+$standardError
+          a         b
+a 0.1617851 0.1617851
+b 0.2038308 0.2038308
+
+$bootStrapSamples
+$bootStrapSamples[[1]]
+          a         b
+a 0.5555556 0.4444444
+b 0.5714286 0.4285714
+
+$bootStrapSamples[[2]]
+          a         b
+a 0.5714286 0.4285714
+b 0.3333333 0.6666667
+
+$bootStrapSamples[[3]]
+          a         b
+a 0.1428571 0.8571429
+b 0.6666667 0.3333333
+
+$bootStrapSamples[[4]]
+      a     b
+a 0.375 0.625
+b 0.750 0.250
+
+$bootStrapSamples[[5]]
+          a         b
+a 0.3333333 0.6666667
+b 0.7142857 0.2857143
+
+$bootStrapSamples[[6]]
+          a         b
+a 0.2222222 0.7777778
+b 0.8571429 0.1428571
+
+$bootStrapSamples[[7]]
+          a         b
+a 0.5454545 0.4545455
+b 1.0000000 0.0000000
+
+$bootStrapSamples[[8]]
+     a    b
+a 0.25 0.75
+b 0.75 0.25
+
+$bootStrapSamples[[9]]
+          a         b
+a 0.4444444 0.5555556
+b 0.5714286 0.4285714
+
+$bootStrapSamples[[10]]
+          a         b
+a 0.5833333 0.4166667
+b 1.0000000 0.0000000
+
