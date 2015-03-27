@@ -1,6 +1,7 @@
 #include <Rcpp.h>
 #include <omp.h>
-#include <unistd.h>
+//#include <unistd.h>
+// [[Rcpp::plugins(openmp)]]
 
 using namespace Rcpp;
 
@@ -222,6 +223,7 @@ List _fromBoot2Estimate(List listMatr) {
 }
 
 List _mcFitBootStrap(CharacterVector data, int nboot=10, bool byrow=true, bool parallel=false) {
+//  nboot = 20;
   List theList = _bootstrapCharacterSequences(data, nboot);
   int n = theList.size();
   List pmsBootStrapped(n);
@@ -230,11 +232,20 @@ List _mcFitBootStrap(CharacterVector data, int nboot=10, bool byrow=true, bool p
 	for(int i = 0; i < n; i++) 
 		pmsBootStrapped[i] = createSequenceMatrix_cpp(theList[i], true, true);
   } else {
-	int cores = sysconf(_SC_NPROCESSORS_ONLN);
-	omp_set_num_threads(cores);
+	//int cores = sysconf(_SC_NPROCESSORS_ONLN);
+//	int cores = parallel::detectCores();
+	int cores = omp_get_num_threads();
+	#pragma omp master
+	{
+		cores = omp_get_num_threads();
+		Rcout << "initial cores: " << cores << std::endl;
+	}
+	//omp_set_num_threads(cores);
 	#pragma omp parallel for
-	for(int i = 0; i < n; i ++) 
+	for(int i = 0; i < n; i ++) {
+		Rcout << omp_get_thread_num() << " cores: " << omp_get_num_threads() << std::endl;
 		pmsBootStrapped[i] = createSequenceMatrix_cpp(theList[i], true, true);
+	}
   }
   List estimateList = _fromBoot2Estimate(pmsBootStrapped);
   NumericMatrix transMatr = _toRowProbs(estimateList["estMu"]);
@@ -294,7 +305,8 @@ S4 _matr2Mc(CharacterMatrix matrData, double laplacian=0) {
 }
 
 // [[Rcpp::export]]
-List markovchainFit_cpp(SEXP data, String method="mle", bool byrow=true, int nboot=10, double laplacian=0, String name="", bool parallel=false, double confidencelevel=0.95) {
+List markovchainFit_cpp(SEXP data, String method="mle", bool byrow=true, int nboot=10, double laplacian=0, String name="", bool parallel=true, double confidencelevel=0.95) {
+//List markovchainFit_cpp(SEXP data, String method="mle", bool byrow=true, int nboot=10, double laplacian=0, String name="", bool parallel=false, double confidencelevel=0.95) {
   List out;
   if(Rf_inherits(data, "data.frame") || Rf_inherits(data, "matrix")) { 
 	CharacterMatrix mat;
@@ -329,18 +341,21 @@ List markovchainFit_cpp(SEXP data, String method="mle", bool byrow=true, int nbo
 
 /*** R 
 library(microbenchmark)
+Sys.setenv("PKG_CXXFLAGS"="-fopenmp")
+Sys.setenv("PKG_LIBS"="-fopenmp")
+
 sequence <- c("a", "b", "a", "a", "a", "a", "b", "a", "b", "a", "b", "a", "a", "b", "b", "b", "a")
 #sequence <- data.frame(t(sequence))
 #microbenchmark(
-  markovchainFit(data = sequence)
+  #markovchainFit(data = sequence)
   #markovchainFit(data = sequence, method="laplace", laplacian=0.1),
   #markovchainFit(data = sequence, method="bootstrap"),
-  #mcfit(data = sequence, method="bootstrap"),
+  mcfit(data = sequence, method="bootstrap")#,
   #markovchainFit(data = sequence, byrow=FALSE)#,
 
-  markovchainFit_cpp(sequence)
+  #markovchainFit_cpp(sequence)
   #markovchainFit_cpp(sequence, "laplace", laplacian=0.1)
-  #markovchainFit_cpp(sequence, "bootstrap")
+  markovchainFit_cpp(sequence, "bootstrap")
   #markovchainFit_cpp(sequence, byrow=FALSE)
 #)
 */

@@ -3,6 +3,14 @@
 #file=simplemc
 file=mcfit
 #file=gibbs
+
+#OPENMPFLAGS=-fopenmp
+#PKG_CPPFLAGS="$(RCPPFLAGS) $(RCPPINCL) $(OPENMPFLAGS)" 
+#PKG_LIBS="$(RLDFLAGS) $(RCPPLIBS) $(OPENMPFLAGS)"
+
+#PKG_CPPFLAGS="-fopenmp" 
+#PKG_LIBS="-fopenmp"
+#R CMD SHLIB $file.R
 R CMD BATCH $file.R
 cat $file.Rout
 
