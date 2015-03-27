@@ -1,10 +1,6 @@
 // [[Rcpp::depends(RcppParallel)]]
 #include <RcppParallel.h>
-
 #include <Rcpp.h>
-#include <omp.h>
-//#include <unistd.h>
-// [[Rcpp::plugins(openmp)]]
 
 using namespace Rcpp;
 
@@ -225,74 +221,21 @@ List _fromBoot2Estimate(List listMatr) {
   return List::create(_["estMu"]=matrMean, _["estSigma"]=matrSd);
 }
 
+// worker for parallel loop
 struct ForLoopWorker : public RcppParallel::Worker
 {
-   //const RcppParallel::RMatrix<double> input;
    const List input;
-
-   //RcppParallel::RMatrix<double> output;
    List output;
 
-   // initialize with source and destination
    ForLoopWorker(const List input, List output)
       : input(input), output(output) {}
 
-/*
- #pragma omp parallel for
-        for(int i = 0; i < n; i ++) {
-                Rcout << omp_get_thread_num() << " cores: " << omp_get_num_threads() << std::endl;
-                pmsBootStrapped[i] = createSequenceMatrix_cpp(theList[i], true, true);
-        }
-*/
    void operator()(std::size_t begin, std::size_t end) {
-  // 	Rcout << "operator " << std::endl;
-        //List x = clone(input);
-//	output = clone(input);
-//	Rcout << "List x ";
-	//Rf_PrintValue(x);
-        //int i = 0;
-	//Rcout << "begin " << begin << " end " << end << std::endl;
 	output[begin] = createSequenceMatrix_cpp(input[begin], true, true);
-	//output[begin] = createSequenceMatrix_cpp(x[begin], true, true);
-	//output[end] = x[end];
-        //for( List::iterator it = (x.begin() + begin); it != (x.end() + end); ++it ) {
-        //        output[i] = x[i];
-	//	output[i] = createSequenceMatrix_cpp(x[i], true, true);
-		//Rf_PrintValue(output[i]);
-		//Rcout << std::endl;
-         //       i ++;
-        //}
-	//Rcout << "List output ";
-	//Rf_PrintValue(output);
-/*
-      std::transform(input.begin() + begin,
-                     input.begin() + end,
-                     output.begin() + begin,
-                     ::sqrt);
-*/
    }
 };
 
-List _parallelForLoop(List theList) {
-
-  int n = theList.size();
-  List pmsBootStrapped(n);
-
-  // SquareRoot functor (pass input and output matrixes)
-  ForLoopWorker forloop(theList, pmsBootStrapped);
-
-  //Rcout << "theList.size() " << n << std::endl;
-  // call parallelFor to do the work
-  parallelFor(0, n, forloop);
-  //parallelFor(0, theList.length(), forloop);
-  //Rcout << "done" << std::endl;
-  //Rf_PrintValue(pmsBootStrapped);
-
-  return pmsBootStrapped;
-}
-
 List _mcFitBootStrap(CharacterVector data, int nboot=10, bool byrow=true, bool parallel=false) {
-  //nboot = 50;
   List theList = _bootstrapCharacterSequences(data, nboot);
   int n = theList.size();
   List pmsBootStrapped(n);
@@ -301,30 +244,8 @@ List _mcFitBootStrap(CharacterVector data, int nboot=10, bool byrow=true, bool p
 	for(int i = 0; i < n; i++) 
 		pmsBootStrapped[i] = createSequenceMatrix_cpp(theList[i], true, true);
   } else {
-//	pmsBootStrapped = _parallelForLoop(theList);
   	ForLoopWorker forloop(theList, pmsBootStrapped);
-
-  //Rcout << "theList.size() " << n << std::endl;
-  // call parallelFor to do the work
   	parallelFor(0, n, forloop);
-   //     Rcout << "parallel done" << std::endl;
-
-	//int cores = sysconf(_SC_NPROCESSORS_ONLN);
-//	int cores = parallel::detectCores();
-/*
-	int cores = omp_get_num_threads();
-	#pragma omp master
-	{
-		cores = omp_get_num_threads();
-		Rcout << "initial cores: " << cores << std::endl;
-	}
-	//omp_set_num_threads(cores);
-	#pragma omp parallel for
-	for(int i = 0; i < n; i ++) {
-		Rcout << omp_get_thread_num() << " cores: " << omp_get_num_threads() << std::endl;
-		pmsBootStrapped[i] = createSequenceMatrix_cpp(theList[i], true, true);
-	}
-*/
   }
   List estimateList = _fromBoot2Estimate(pmsBootStrapped);
   NumericMatrix transMatr = _toRowProbs(estimateList["estMu"]);
@@ -384,8 +305,7 @@ S4 _matr2Mc(CharacterMatrix matrData, double laplacian=0) {
 }
 
 // [[Rcpp::export]]
-List markovchainFit_cpp(SEXP data, String method="mle", bool byrow=true, int nboot=10, double laplacian=0, String name="", bool parallel=true, double confidencelevel=0.95) {
-//List markovchainFit_cpp(SEXP data, String method="mle", bool byrow=true, int nboot=10, double laplacian=0, String name="", bool parallel=false, double confidencelevel=0.95) {
+List markovchainFit_cpp(SEXP data, String method="mle", bool byrow=true, int nboot=10, double laplacian=0, String name="", bool parallel=false, double confidencelevel=0.95) {
   List out;
   if(Rf_inherits(data, "data.frame") || Rf_inherits(data, "matrix")) { 
 	CharacterMatrix mat;
@@ -416,42 +336,3 @@ List markovchainFit_cpp(SEXP data, String method="mle", bool byrow=true, int nbo
   }
   return out;
 }
-
-
-/*** R 
-library(microbenchmark)
-#Sys.setenv("PKG_CXXFLAGS"="-fopenmp")
-#Sys.setenv("PKG_LIBS"="-fopenmp")
-
-sequence <- c("a", "b", "a", "a", "a", "a", "b", "a", "b", "a", "b", "a", "a", "b", "b", "b", "a")
-#sequence <- data.frame(t(sequence))
-
-library(rbenchmark)
-#res <- benchmark(mcfit(sequence, "bootstrap"),
-#                 markovchainFit_cpp(sequence, "bootstrap"),
-#                 order="relative")
-#res[,1:4]
-
-#microbenchmark(
-  #markovchainFit(data = sequence)
-  #markovchainFit(data = sequence, method="laplace", laplacian=0.1),
-  #markovchainFit(data = sequence, method="bootstrap"),
-  #mcfit(data = sequence, method="bootstrap"),
-  #markovchainFit(data = sequence, byrow=FALSE)#,
-
-  #markovchainFit_cpp(sequence)
-  #markovchainFit_cpp(sequence, "laplace", laplacian=0.1)
-  markovchainFit_cpp(sequence, "bootstrap")
-  #markovchainFit_cpp(sequence, byrow=FALSE)
-#)
-*/
-/*  markovchainFit_cpp(sequence)
-  #markovchainFit_cpp(sequence, byrow=FALSE)
-*/
-/*
-microbenchmark(
-  markovchainFit(data = sequence),
-  markovchainFit_cpp(100, 10)
-)
-*/
-

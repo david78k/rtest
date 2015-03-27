@@ -312,85 +312,7 @@ The following object is masked from ‘package:base’:
 + }
 > 
 > library(Rcpp)
-> sourceCpp("mcfit.cpp")
-
-> library(microbenchmark)
-
-> sequence <- c("a", "b", "a", "a", "a", "a", "b", "a", 
-+     "b", "a", "b", "a", "a", "b", "b", "b", "a")
-
-> library(rbenchmark)
-
-> markovchainFit_cpp(sequence, "bootstrap")
-$estimate
-BootStrap Estimate 
- A  2 - dimensional discrete Markov Chain with following states 
- a b 
- The transition matrix   (by rows)  is defined as follows 
-          a         b
-a 0.4958586 0.5041414
-b 0.7169048 0.2830952
-
-
-$standardError
-          a         b
-a 0.1285527 0.1285527
-b 0.1885174 0.1885174
-
-$bootStrapSamples
-$bootStrapSamples[[1]]
-          a         b
-a 0.6000000 0.4000000
-b 0.6666667 0.3333333
-
-$bootStrapSamples[[2]]
-      a     b
-a 0.500 0.500
-b 0.625 0.375
-
-$bootStrapSamples[[3]]
-          a         b
-a 0.6363636 0.3636364
-b 0.8000000 0.2000000
-
-$bootStrapSamples[[4]]
-          a         b
-a 0.3333333 0.6666667
-b 0.7142857 0.2857143
-
-$bootStrapSamples[[5]]
-    a   b
-a 0.4 0.6
-b 1.0 0.0
-
-$bootStrapSamples[[6]]
-          a         b
-a 0.5833333 0.4166667
-b 1.0000000 0.0000000
-
-$bootStrapSamples[[7]]
-     a    b
-a 0.25 0.75
-b 0.75 0.25
-
-$bootStrapSamples[[8]]
-          a         b
-a 0.5555556 0.4444444
-b 0.5714286 0.4285714
-
-$bootStrapSamples[[9]]
-      a     b
-a 0.500 0.500
-b 0.375 0.625
-
-$bootStrapSamples[[10]]
-          a         b
-a 0.6000000 0.4000000
-b 0.6666667 0.3333333
-
-
-Warning message:
-In fun(libname, pkgname) : no DISPLAY variable so Tk is not available
+> sourceCpp("1_functions4FittingTae.cpp")
 > 
 > #sequence <- c("a", "b", "a", "a", "a", "a", "b", "a", "b", "a", "b", "a", "a", "b", "b", "b", "a")
 > #mcfit(sequence, method="bootstrap")
@@ -404,4 +326,4 @@ In fun(libname, pkgname) : no DISPLAY variable so Tk is not available
 > 
 > proc.time()
    user  system elapsed 
- 13.608   1.975  15.670 
+ 12.721   2.453  15.252 
