@@ -1,6 +1,7 @@
 // [[Rcpp::depends(RcppParallel)]]
 #include <RcppParallel.h>
 #include <Rcpp.h>
+#include <time.h>
 
 using namespace Rcpp;
 

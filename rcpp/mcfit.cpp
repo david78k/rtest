@@ -1,10 +1,19 @@
 // [[Rcpp::depends(RcppParallel)]]
 #include <RcppParallel.h>
-
 #include <Rcpp.h>
-#include <omp.h>
+#include <time.h>
+#include <exception>
+//#include <chrono>
+
+#ifdef WIN32
+#include <windows.h>
+#else
+#include <unistd.h>
+#endif // win32
+
+//#include <omp.h>
 //#include <unistd.h>
-// [[Rcpp::plugins(openmp)]]
+//// [[Rcpp::plugins(openmp)]]
 
 using namespace Rcpp;
 
@@ -40,8 +49,10 @@ NumericMatrix _toRowProbs(NumericMatrix x) {
 // [[Rcpp::export]]
 NumericMatrix createSequenceMatrix_cpp(CharacterVector stringchar, bool toRowProbs=false, bool sanitize=true) {
   CharacterVector elements = unique(stringchar).sort();
+  //Rf_PrintValue(elements);
   int sizeMatr = elements.size();
   
+//  Rcout << "sizeMatr: " << sizeMatr << std::endl;
   NumericMatrix freqMatrix(sizeMatr);
   freqMatrix.attr("dimnames") = List::create(elements, elements); 
   CharacterVector rnames = rownames(freqMatrix);
@@ -63,8 +74,12 @@ NumericMatrix createSequenceMatrix_cpp(CharacterVector stringchar, bool toRowPro
     		for (int j = 0; j < sizeMatr; j++) 
       			rowSum += freqMatrix(i, j);
 		if(rowSum == 0)
-    			for (int j = 0; j < sizeMatr; j++) 
+    			for (int j = 0; j < sizeMatr; j++) {
       				freqMatrix(i, j) = 1/sizeMatr;
+				//if (isnan(freqMatrix(i, j))) Rcout << "NAN" << std::endl;
+				//if (freqMatrix(i, j) == "NaN") Rcout << "NAN char" << std::endl;
+				//Rcout << freqMatrix(i, j) << std::endl;
+			}
 	}
   }
   if(toRowProbs==true)
@@ -253,17 +268,18 @@ struct ForLoopWorker : public RcppParallel::Worker
         //int i = 0;
 	//Rcout << "begin " << begin << " end " << end << std::endl;
 	output[begin] = createSequenceMatrix_cpp(input[begin], true, true);
-	//output[begin] = createSequenceMatrix_cpp(x[begin], true, true);
-	//output[end] = x[end];
-        //for( List::iterator it = (x.begin() + begin); it != (x.end() + end); ++it ) {
-        //        output[i] = x[i];
-	//	output[i] = createSequenceMatrix_cpp(x[i], true, true);
-		//Rf_PrintValue(output[i]);
-		//Rcout << std::endl;
-         //       i ++;
-        //}
+	//output[end] = input[end];
 	//Rcout << "List output ";
-	//Rf_PrintValue(output);
+/*
+	int ms = 10;
+	#ifdef WIN32
+    	Sleep(ms);
+    	#else
+    	usleep(ms * 1000);
+    	#endif // win32
+*/
+//	std::this_thread::sleep_for (std::chrono::seconds(1));
+//	Rf_PrintValue(output[begin]);
 /*
       std::transform(input.begin() + begin,
                      input.begin() + end,
@@ -273,27 +289,11 @@ struct ForLoopWorker : public RcppParallel::Worker
    }
 };
 
-List _parallelForLoop(List theList) {
-
-  int n = theList.size();
-  List pmsBootStrapped(n);
-
-  // SquareRoot functor (pass input and output matrixes)
-  ForLoopWorker forloop(theList, pmsBootStrapped);
-
-  //Rcout << "theList.size() " << n << std::endl;
-  // call parallelFor to do the work
-  parallelFor(0, n, forloop);
-  //parallelFor(0, theList.length(), forloop);
-  //Rcout << "done" << std::endl;
-  //Rf_PrintValue(pmsBootStrapped);
-
-  return pmsBootStrapped;
-}
-
 List _mcFitBootStrap(CharacterVector data, int nboot=10, bool byrow=true, bool parallel=false) {
-  //nboot = 50;
+  //nboot = 3;
+  //Rcout << "start _mcFitBootStrap" << std::endl;
   List theList = _bootstrapCharacterSequences(data, nboot);
+  //Rcout << "finished theList" << std::endl;
   int n = theList.size();
   List pmsBootStrapped(n);
 
@@ -301,13 +301,17 @@ List _mcFitBootStrap(CharacterVector data, int nboot=10, bool byrow=true, bool p
 	for(int i = 0; i < n; i++) 
 		pmsBootStrapped[i] = createSequenceMatrix_cpp(theList[i], true, true);
   } else {
-//	pmsBootStrapped = _parallelForLoop(theList);
-  	ForLoopWorker forloop(theList, pmsBootStrapped);
+    //    Rcout << "else parallel" << std::endl;
+	ForLoopWorker forloop(theList, pmsBootStrapped);
+      //  Rcout << "end ForLoopWorker" << std::endl;
 
   //Rcout << "theList.size() " << n << std::endl;
   // call parallelFor to do the work
-  	parallelFor(0, n, forloop);
-   //     Rcout << "parallel done" << std::endl;
+	parallelFor(0, n, forloop);
+	//for(int i = 0; i < n; i++) 
+	//	pmsBootStrapped[i] = createSequenceMatrix_cpp(theList[i], true, true);
+	//Rcout << "pmsBootStrapped: " << std::endl;
+	//Rf_PrintValue(pmsBootStrapped);
 
 	//int cores = sysconf(_SC_NPROCESSORS_ONLN);
 //	int cores = parallel::detectCores();
@@ -333,6 +337,8 @@ List _mcFitBootStrap(CharacterVector data, int nboot=10, bool byrow=true, bool p
   estimate.slot("transitionMatrix") = transMatr;
   estimate.slot("byrow") = byrow;
   estimate.slot("name") = "BootStrap Estimate";  
+
+  Rcout << "end _mcFitBootStrap" << std::endl;
 
   return List::create(_["estimate"] = estimate
 		, _["standardError"] = estimateList["estSigma"]
@@ -384,9 +390,9 @@ S4 _matr2Mc(CharacterMatrix matrData, double laplacian=0) {
 }
 
 // [[Rcpp::export]]
-List markovchainFit_cpp(SEXP data, String method="mle", bool byrow=true, int nboot=10, double laplacian=0, String name="", bool parallel=true, double confidencelevel=0.95) {
-//List markovchainFit_cpp(SEXP data, String method="mle", bool byrow=true, int nboot=10, double laplacian=0, String name="", bool parallel=false, double confidencelevel=0.95) {
+List markovchainFit_cpp(SEXP data, String method="mle", bool byrow=true, int nboot=10, double laplacian=0, String name="", bool parallel=false, double confidencelevel=0.95) {
   List out;
+  Rcout << "start call" << std::endl;
   if(Rf_inherits(data, "data.frame") || Rf_inherits(data, "matrix")) { 
 	CharacterMatrix mat;
     	//if data is a data.frame forced to matrix
@@ -404,6 +410,7 @@ List markovchainFit_cpp(SEXP data, String method="mle", bool byrow=true, int nbo
    	S4 outMc =_matr2Mc(mat,laplacian);
  	out = List::create(_["estimate"] = outMc);
   } else {
+    Rcout << "else" << std::endl;
     if(method == "mle") out = _mcFitMle(data, byrow);
     if(method == "bootstrap") out = _mcFitBootStrap(data, nboot, byrow, parallel);
     if(method == "laplace") out = _mcFitLaplacianSmooth(data, byrow, laplacian);
@@ -414,12 +421,14 @@ List markovchainFit_cpp(SEXP data, String method="mle", bool byrow=true, int nbo
     estimate.slot("name") = name;
     out["estimate"] = estimate;
   }
+  Rcout << "end call" << std::endl;
   return out;
 }
 
 
 /*** R 
 library(microbenchmark)
+library(parallel)
 #Sys.setenv("PKG_CXXFLAGS"="-fopenmp")
 #Sys.setenv("PKG_LIBS"="-fopenmp")
 
@@ -427,21 +436,25 @@ sequence <- c("a", "b", "a", "a", "a", "a", "b", "a", "b", "a", "b", "a", "a", "
 #sequence <- data.frame(t(sequence))
 
 library(rbenchmark)
-#res <- benchmark(mcfit(sequence, "bootstrap"),
-#                 markovchainFit_cpp(sequence, "bootstrap"),
-#                 order="relative")
-#res[,1:4]
+#res <- benchmark(replications = 5,
+res <- benchmark(replications = 10,
+		mcfit(sequence, "bootstrap", parallel=TRUE),
+                 markovchainFit_cpp(sequence, "bootstrap", parallel=TRUE),
+                 order="relative")
+res[,1:4]
 
 #microbenchmark(
   #markovchainFit(data = sequence)
   #markovchainFit(data = sequence, method="laplace", laplacian=0.1),
   #markovchainFit(data = sequence, method="bootstrap"),
-  #mcfit(data = sequence, method="bootstrap"),
+#  mcfit(data = sequence, method="bootstrap"),
+  #mcfit(data = sequence, method="bootstrap", parallel=TRUE),
   #markovchainFit(data = sequence, byrow=FALSE)#,
 
   #markovchainFit_cpp(sequence)
   #markovchainFit_cpp(sequence, "laplace", laplacian=0.1)
-  markovchainFit_cpp(sequence, "bootstrap")
+#  markovchainFit_cpp(data=sequence, method="bootstrap", parallel=TRUE)
+  #markovchainFit_cpp(sequence, "bootstrap")
   #markovchainFit_cpp(sequence, byrow=FALSE)
 #)
 */
